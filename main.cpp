@@ -1,4 +1,6 @@
 #include <Novice.h>
+#include "VectorFunction.h"
+#include "MatrixFunction.h"
 
 const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_00";
 
