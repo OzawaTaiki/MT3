@@ -2,7 +2,7 @@
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
 
-const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_00";
+const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_03";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -14,6 +14,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
+	Vector3 translate = { 4.1f,2.6f,0.8f };
+	Vector3 scale = { 1.5f,5.2f,7.3f };
+	Matrix4x4 translateMatrix = MatrixFunction::MakeTranslateMatrix(translate);
+	Matrix4x4 scaleMatrix = MatrixFunction::MakeScaleMatrix(scale);
+	Vector3 point = { 2.3f,3.8f,1.4f };
+	Matrix4x4 trasformMatrix = {
+		1.0f,2.0f,3.0f,4.0f,
+		3.0f,1.0f,1.0f,2.0f,
+		1.0f,4.0f,2.0f,3.0f,
+		2.0f,2.0f,1.0f,3.0f
+	};
+	Vector3 transformed = VectorFunction::Transform(point, trasformMatrix);
 
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -39,6 +51,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
+
+		VectorFunction::VectorScreenPrintf(0, 0, transformed, "transformed");
+		MatrixFunction::MatrixScreenPrintf(0, kRowHeight, translateMatrix, "translateMatrix");
+		MatrixFunction::MatrixScreenPrintf(0, kRowHeight * 6, scaleMatrix, "scaleMatrix");
 
 
 		///
