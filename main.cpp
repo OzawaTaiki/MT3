@@ -3,7 +3,7 @@
 #include "MatrixFunction.h"
 #include <imgui.h>
 
-const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_00";
+const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_01_01";
 
 static const int kWindowWidth = 1280;
 static const int kWindowHeght = 720;
