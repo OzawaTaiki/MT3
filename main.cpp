@@ -14,7 +14,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-
+	Vector3 rotate = { 0.4f,1.43f,-0.8f };
+	Matrix4x4 rotateXMatrix = MatrixFunction::MakeRotateXMatrix(rotate.x);
+	Matrix4x4 rotateYMatrix = MatrixFunction::MakeRotateYMatrix(rotate.y);
+	Matrix4x4 rotateZMatrix = MatrixFunction::MakeRotateZMatrix(rotate.z);
+	Matrix4x4 rotateXYZMatrix = MatrixFunction::Multiply(rotateXMatrix, MatrixFunction::Multiply(rotateYMatrix, rotateZMatrix));
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -40,6 +44,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 
+		MatrixFunction::MatrixScreenPrintf(0, 0, rotateXMatrix, "rotateXMatrix");
+		MatrixFunction::MatrixScreenPrintf(0, kRowHeight * 5, rotateYMatrix, "rotateYMatrix");
+		MatrixFunction::MatrixScreenPrintf(0, kRowHeight * 5 * 2, rotateZMatrix, "rotateZMatrix");
+		MatrixFunction::MatrixScreenPrintf(0, kRowHeight * 5 * 3, rotateXYZMatrix, "rotateXYZMatrix");
 
 		///
 		/// ↑描画処理ここまで
