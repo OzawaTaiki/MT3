@@ -1,8 +1,14 @@
 #include <Novice.h>
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <imgui.h>
 
 const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_00";
+
+static const int kWindowWidth = 1280;
+static const int kWindowHeght = 720;
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
