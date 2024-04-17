@@ -2,7 +2,7 @@
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
 
-const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_00";
+const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_01_00";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -14,6 +14,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
+	Matrix4x4 orthographicMatrix = MatrixFunction::MakeOrthographicMatrix(-160.0f, 160.0f, 200.0f, 300.0f, 0.0f, 1000.0f);
+	Matrix4x4 perspectiveFovMatrix = MatrixFunction::MakePerspectiveFovMatrix(0.63f, 1.33f, 0.1f, 1000.0f);
+	Matrix4x4 viewportMatrix = MatrixFunction::MakeViewportMatrix(100.0f, 200.0f, 600.0f, 300.0f, 0.0f, 1.0f);
 
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -29,7 +32,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-
+		MatrixFunction::MatrixScreenPrintf(0, 0, orthographicMatrix, "orthographicMatrix");
+		MatrixFunction::MatrixScreenPrintf(0, kRowHeight * 5, perspectiveFovMatrix, "perspectiveFovMatrix");
+		MatrixFunction::MatrixScreenPrintf(0, kRowHeight * 5 * 2, viewportMatrix, "viewportMatrix");
 
 		///
 		/// ↑更新処理ここまで
