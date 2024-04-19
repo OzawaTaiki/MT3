@@ -1,11 +1,12 @@
 #include <Novice.h>
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
+#include "Camera.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <imgui.h>
 
-const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_00";
+const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_02_00";
 
 static const int kWindowWidth = 1280;
 static const int kWindowHeght = 720;
@@ -20,7 +21,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-
+	Camera* camera = new Camera(kWindowWidth, kWindowHeght);
+	camera->initialize();
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -30,6 +32,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// キー入力を受け取る
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
+
+		camera->Update(keys, preKeys);
 
 		///
 		/// ↓更新処理ここから
