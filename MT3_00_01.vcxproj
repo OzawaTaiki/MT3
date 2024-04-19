@@ -119,6 +119,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MatrixFunction.cpp" />
+    <ClCompile Include="MyLib.cpp" />
     <ClCompile Include="VectorFunction.cpp" />
   </ItemGroup>
   <ItemGroup>

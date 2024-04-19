@@ -8,7 +8,7 @@ Camera::Camera(int _windowWidth, int _windowHeight)
 
 	projectionMatrix = MatrixFunction::MakePerspectiveFovMatrix(0.45f, windowSize.x / windowSize.y, 0.1f, 100.0f);
 	viewportMatrix = MatrixFunction::MakeViewportMatrix(0, 0, windowSize.x, windowSize.y, 0.0f, 1.0f);
-
+	initialize();
 }
 
 Camera::~Camera()
@@ -29,7 +29,7 @@ void Camera::Update(const char* _keys, const char* _preKeys)
 {
 
 #ifdef _DEBUG
-	//ImGui();
+	ImGui();
 #endif // _DEBUG
 
 	if (_keys[DIK_LCONTROL] &&
@@ -73,11 +73,13 @@ void Camera::Update(const char* _keys, const char* _preKeys)
 	viewMatrix = MatrixFunction::Inverse(cameraMatrix);
 	viewProjectionMatrix = MatrixFunction::Multiply(viewMatrix, projectionMatrix);
 }
-//
-//void Camera::ImGui()
-//{
-//	ImGui::Begin("camera");
-//	ImGui::DragFloat3("cameraTranslate", &translate.x, 0.01f);
-//	ImGui::DragFloat3("cameraRotate", &rotate.x, 0.01f);
-//	ImGui::End();
-//}
+
+void Camera::ImGui()
+{
+	ImGui::Begin("camera");
+	ImGui::DragFloat3("cameraTranslate", &translate.x, 0.01f);
+	ImGui::DragFloat3("cameraRotate", &rotate.x, 0.01f);
+	ImGui::DragFloat("mouseSensi", &mouseSensi, 0.00001f);
+	ImGui::DragFloat("moveSpeed", &cameraMoveSpeed, 0.001f);
+	ImGui::End();
+}

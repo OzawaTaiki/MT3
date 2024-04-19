@@ -19,7 +19,15 @@ public:
 
 	void Update(const char* _keys, const char* _preKeys);
 
+	Matrix4x4 GetViewportMatrix() { return viewportMatrix; };
+	Matrix4x4 GetviewProjectionMatrix() { return viewProjectionMatrix; };
+
 private:
+
+#ifdef _DEBUG
+	void ImGui();
+#endif // _DEBUG
+
 
 	Vector2 windowSize;
 

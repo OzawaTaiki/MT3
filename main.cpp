@@ -1,6 +1,5 @@
 #include <Novice.h>
-#include "VectorFunction.h"
-#include "MatrixFunction.h"
+#include "MyLib.h"
 #include "Camera.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -24,6 +23,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Camera* camera = new Camera(kWindowWidth, kWindowHeght);
 	camera->initialize();
 
+	Sphere sphere;
+	sphere = {
+		{0,0,0},
+		0.5f
+	};
+
+	Segment segment{ {-2.0f,-1.0f,0.0f},{3.0f,2.0f,2.0f} };
+	Vector3 point{ -1.5f,0.6f,0.6f };
+
+	Vector3 project = Project(VectorFunction::Subtract(point, segment.origin), segment.diff);
+	Vector3 closestPoint = ClosestPoint(point, segment);
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -39,7 +50,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
+		ImGui::Begin("window");
+		ImGui::DragFloat3("point", &point.x, 0.01f);
+		ImGui::InputFloat3("segment origin", &segment.origin.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("segment diff", &segment.diff.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("project", &project.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("closestPoint", &closestPoint.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::End();
 
+
+		project = Project(VectorFunction::Subtract(point, segment.origin), segment.diff);
+		closestPoint = ClosestPoint(point, segment);
+
+		Sphere pointSphere{ point,0.01f };
+		Sphere closestpointSphere{ closestPoint,0.01f };
 
 		///
 		/// ↑更新処理ここまで
@@ -49,7 +73,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
+		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
+		Drawline(segment.origin, segment.diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		DrawSphere(pointSphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), RED);
+		DrawSphere(closestpointSphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), BLACK);
 
 		///
 		/// ↑描画処理ここまで
