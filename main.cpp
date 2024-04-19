@@ -1,6 +1,6 @@
 #include <Novice.h>
-#include "VectorFunction.h"
-#include "MatrixFunction.h"
+#include "MyLib.h"
+#include "Camera.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <imgui.h>
@@ -20,7 +20,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-
+	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -30,6 +30,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// キー入力を受け取る
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
+
+		camera->Update(keys, preKeys);
 
 		///
 		/// ↓更新処理ここから
@@ -45,7 +47,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-
+		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
 		///
 		/// ↑描画処理ここまで
