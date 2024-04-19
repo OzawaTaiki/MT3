@@ -74,6 +74,8 @@ Vector3 VectorFunction::Normalize(const Vector3& v)
 {
 	Vector3 result;
 	float lenght = length(v);
+	if (lenght == 0)
+		return{ 0 };
 	result.x = v.x / lenght;
 	result.y = v.y / lenght;
 	result.z = v.z / lenght;

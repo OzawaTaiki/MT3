@@ -8,13 +8,13 @@
 const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_00";
 
 static const int kWindowWidth = 1280;
-static const int kWindowHeght = 720;
+static const int kWindowHeight = 720;
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// ライブラリの初期化
-	Novice::Initialize(kWindowTitle, 1280, 720);
+	Novice::Initialize(kWindowTitle, kWindowWidth, kWindowHeight);
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
