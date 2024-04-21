@@ -62,6 +62,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 	}
 
+	delete camera;
+
 	// ライブラリの終了
 	Novice::Finalize();
 	return 0;
