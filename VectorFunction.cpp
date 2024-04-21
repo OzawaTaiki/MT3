@@ -112,3 +112,23 @@ Vector3 VectorFunction::Transform(const Vector3& vector, const Matrix4x4& matrix
 	result.z /= w;
 	return result;
 }
+
+Vector3 operator+(const Vector3& _v1, const Vector3& _v2)
+{
+	return Vector3(_v1.x + _v2.x, _v1.y + _v2.y, _v1.z + _v2.z);
+}
+
+Vector3 operator-(const Vector3& _v1, const Vector3& _v2)
+{
+	return Vector3(_v1.x - _v2.x, _v1.y - _v2.y, _v1.z - _v2.z);
+}
+
+Vector3 operator*(const Vector3& _v1, const Vector3& _v2)
+{
+	return Vector3(_v1.x * _v2.x, _v1.y * _v2.y, _v1.z * _v2.z);
+}
+
+Vector3 operator/(const Vector3& _v1, const Vector3& _v2)
+{
+	return Vector3(_v1.x / _v2.x, _v1.y / _v2.y, _v1.z / _v2.z);
+}
