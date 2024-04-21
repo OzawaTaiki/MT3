@@ -21,6 +21,7 @@ public:
 
 	Matrix4x4 GetViewportMatrix() { return viewportMatrix; };
 	Matrix4x4 GetviewProjectionMatrix() { return viewProjectionMatrix; };
+	Vector3 GetTranslate() { return translate; };
 
 private:
 
