@@ -5,7 +5,7 @@
 #include <cmath>
 #include <imgui.h>
 
-const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_00";
+const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_02_01";
 
 static const int kWindowWidth = 1280;
 static const int kWindowHeight = 720;
@@ -21,6 +21,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = { 0 };
 
 	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
+	
+	Sphere s1{ {0,0,0},0.3f }, s2{ {0.5f,0,0},0.15f };
+
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -37,6 +40,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
+		ImGui::Begin("window");
+		ImGui::DragFloat3("center", &s1.center.x, 0.01f);
+		ImGui::DragFloat("radius", &s1.radius, 0.01f);
+		ImGui::End();
 
 
 		///
@@ -48,6 +55,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
+
+		DrawSphere(s1, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), IsCollision(s1, s2) ? RED : WHITE);
+		DrawSphere(s2, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///
 		/// ↑描画処理ここまで
