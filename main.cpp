@@ -22,6 +22,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
 
+	Plane plane;
+	plane.normal = { 0,1,0 };
+	plane.distance = 0.2f;
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -37,6 +41,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
+		/*ImGui::Begin("Sphere");
+		ImGui::DragFloat3("Position", &plane.normal.x, 0.01f);
+		ImGui::DragFloat("Distance", &plane.distance, 0.01f);
+		ImGui::End();*/
+
+		ImGui::Begin("Plane");
+		ImGui::DragFloat3("normal", &plane.normal.x, 0.01f);
+		ImGui::DragFloat("Distance", &plane.distance, 0.01f);
+		ImGui::End();
+
+		plane.normal = VectorFunction::Normalize(plane.normal);
 
 
 		///
@@ -48,6 +63,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
+
+		DrawPlane(plane, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///
 		/// ↑描画処理ここまで
