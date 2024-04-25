@@ -189,8 +189,12 @@ bool IsCollision(const Sphere& _s1, const Sphere& _s2)
 
 bool IsCollision(const Sphere& _s, const Plane& _p)
 {
+	float distance = VectorFunction::Dot(_p.normal, _s.center) - _p.distance;
+	distance = distance < 0 ? -distance: distance;
 
-
+	if (distance < _s.radius)
+		return true;
 	return false;
 }
+
 

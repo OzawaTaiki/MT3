@@ -5,7 +5,7 @@
 #include <cmath>
 #include <imgui.h>
 
-const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_00";
+const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_02_02";
 
 static const int kWindowWidth = 1280;
 static const int kWindowHeight = 720;
@@ -24,7 +24,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Plane plane;
 	plane.normal = { 0,1,0 };
-	plane.distance = 0.2f;
+	plane.distance = 1.0f;
+
+	Sphere sphere;
+	sphere.center = { 0,0,0 };
+	sphere.radius = 0.2f;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -41,10 +45,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		/*ImGui::Begin("Sphere");
-		ImGui::DragFloat3("Position", &plane.normal.x, 0.01f);
-		ImGui::DragFloat("Distance", &plane.distance, 0.01f);
-		ImGui::End();*/
+		ImGui::Begin("Sphere");
+		ImGui::DragFloat3("Position", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("radius", &sphere.radius, 0.01f);
+		ImGui::End();
 
 		ImGui::Begin("Plane");
 		ImGui::DragFloat3("normal", &plane.normal.x, 0.01f);
@@ -53,6 +57,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		plane.normal = VectorFunction::Normalize(plane.normal);
 
+
+		bool isCollision = IsCollision(sphere, plane);
 
 		///
 		/// ↑更新処理ここまで
@@ -64,6 +70,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
+		DrawSphere(sphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollision ? RED : WHITE);
 		DrawPlane(plane, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///
