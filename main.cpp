@@ -57,7 +57,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		plane.normal = VectorFunction::Normalize(plane.normal);
 
-
 		bool isCollision = IsCollision(sphere, plane);
 
 		///
