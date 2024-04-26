@@ -92,7 +92,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix)
 {
-	const float kGridHalfWidth = 1.0f;                                          // Gridの半分の幅
+	const float kGridHalfWidth = 2.0f;                                          // Gridの半分の幅
 	const uint32_t kSubdivision = 10;                                           // 分割数
 	const float kGridEvery = (kGridHalfWidth * 2.0f) / float(kSubdivision);     // １つ分の長さ
 
@@ -104,16 +104,11 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 		Vector3 startPos = { x,0,-kGridHalfWidth };
 		Vector3 endPos = { x,0,kGridHalfWidth };
 		// スクリーン座標系まで変換をかける
-		Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, startPos);
-		Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
 
-		Vector3 temp = VectorFunction::Transform(startPos, worldViewprojectionMatrix);
+		Vector3 temp = VectorFunction::Transform(startPos, _viewProjectionMatrix);
 		startPos = VectorFunction::Transform(temp, _viewportMatrix);
 
-		worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, endPos);
-		worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
-		temp = VectorFunction::Transform(endPos, worldViewprojectionMatrix);
+		temp = VectorFunction::Transform(endPos, _viewProjectionMatrix);
 		endPos = VectorFunction::Transform(temp, _viewportMatrix);
 
 		// 変換した座標を使って表示。
@@ -127,16 +122,12 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 		Vector3 startPos = { -kGridHalfWidth,0,z };
 		Vector3 endPos = { kGridHalfWidth,0,z };
 		// スクリーン座標系まで変換をかける
-		Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, startPos);
-		Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
 
-		Vector3 temp = VectorFunction::Transform(startPos, worldViewprojectionMatrix);
+		Vector3 temp = VectorFunction::Transform(startPos, _viewProjectionMatrix);
 		startPos = VectorFunction::Transform(temp, _viewportMatrix);
 
-		worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, endPos);
-		worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
 
-		temp = VectorFunction::Transform(endPos, worldViewprojectionMatrix);
+		temp = VectorFunction::Transform(endPos, _viewProjectionMatrix);
 		endPos = VectorFunction::Transform(temp, _viewportMatrix);
 
 		// 変換した座標を使って表示。
@@ -185,10 +176,7 @@ void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, c
 			Vector3 drawPoint[3];
 			for (int i = 0; i < 3; i++)
 			{
-				Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, point[i]);
-				Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
-				Vector3 temp = VectorFunction::Transform(point[i], worldViewprojectionMatrix);
+				Vector3 temp = VectorFunction::Transform(point[i], _viewProjectionMatrix);
 				drawPoint[i] = VectorFunction::Transform(temp, _viewportMatrix);
 			}
 
