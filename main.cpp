@@ -22,6 +22,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
 
+	Segment segment;
+	segment.origin = { 0.0f,0.0f,0.0f };
+	segment.diff = { 0.5f,0.5f,0.0f };
+
+	Plane plane;
+	plane.normal = { 0.0f,1.0f,0.0f };
+	plane.distance = 1.0f;
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -37,7 +45,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
+		/*ImGui::Begin("Sphere");
+		ImGui::DragFloat3("Position", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("radius", &sphere.radius, 0.01f);
+		ImGui::End();*/
 
+		ImGui::Begin("Plane");
+		ImGui::DragFloat3("normal", &plane.normal.x, 0.01f);
+		ImGui::DragFloat("Distance", &plane.distance, 0.01f);
+		ImGui::End();
+
+		ImGui::Begin("Segment");
+		ImGui::DragFloat3("normal", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("Distance", &segment.diff.x, 0.01f);
+		ImGui::End();
+
+		bool isCollision = IsCollision(plane, segment);
 
 		///
 		/// ↑更新処理ここまで
@@ -48,6 +71,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
+
+		DrawPlane(plane, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		Drawline(segment.origin, segment.diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollision ? RED : WHITE);
 
 		///
 		/// ↑描画処理ここまで

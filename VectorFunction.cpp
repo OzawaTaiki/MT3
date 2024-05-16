@@ -132,3 +132,8 @@ Vector3 operator/(const Vector3& _v1, const Vector3& _v2)
 {
 	return Vector3(_v1.x / _v2.x, _v1.y / _v2.y, _v1.z / _v2.z);
 }
+
+Vector3 operator*(const Vector3& _v, const float _s)
+{
+	return Vector3(_v.x * _s, _v.y * _s, _v.z * _s);
+}

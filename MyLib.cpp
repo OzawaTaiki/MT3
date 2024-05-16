@@ -11,20 +11,15 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 	for (uint32_t xIndex = 0; xIndex <= kSubdivision; xIndex++)
 	{
 		// 上の情報を使ってワールド座標系状の始点と終点を求める
-		float x = -kGridHalfWidth + xIndex * kGridEvery;
-		Vector3 startPos = { x,0,-kGridHalfWidth };
-		Vector3 endPos = { x,0,kGridHalfWidth };
-		// スクリーン座標系まで変換をかける
-		Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, startPos);
-		Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
+		float x = kGridHalfWidth - xIndex * kGridEvery;
+		Vector3 startPos = { -kGridHalfWidth,0,x };
+		Vector3 endPos = { kGridHalfWidth,0,x };
 
-		Vector3 temp = VectorFunction::Transform(startPos, worldViewprojectionMatrix);
+		// スクリーン座標系まで変換をかける
+		Vector3 temp = VectorFunction::Transform(startPos, _viewProjectionMatrix);
 		startPos = VectorFunction::Transform(temp, _viewportMatrix);
 
-		worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, endPos);
-		worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
-		temp = VectorFunction::Transform(endPos, worldViewprojectionMatrix);
+		temp = VectorFunction::Transform(endPos, _viewProjectionMatrix);
 		endPos = VectorFunction::Transform(temp, _viewportMatrix);
 
 		// 変換した座標を使って表示。
@@ -38,16 +33,10 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 		Vector3 startPos = { -kGridHalfWidth,0,z };
 		Vector3 endPos = { kGridHalfWidth,0,z };
 		// スクリーン座標系まで変換をかける
-		Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, startPos);
-		Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
-		Vector3 temp = VectorFunction::Transform(startPos, worldViewprojectionMatrix);
+		Vector3 temp = VectorFunction::Transform(startPos, _viewProjectionMatrix);
 		startPos = VectorFunction::Transform(temp, _viewportMatrix);
 
-		worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, endPos);
-		worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
-		temp = VectorFunction::Transform(endPos, worldViewprojectionMatrix);
+		temp = VectorFunction::Transform(endPos, _viewProjectionMatrix);
 		endPos = VectorFunction::Transform(temp, _viewportMatrix);
 
 		// 変換した座標を使って表示。
@@ -97,10 +86,7 @@ void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, c
 			Vector3 drawPoint[3];
 			for (int i = 0; i < 3; i++)
 			{
-				Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, point[i]);
-				Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
-				Vector3 temp = VectorFunction::Transform(point[i], worldViewprojectionMatrix);
+				Vector3 temp = VectorFunction::Transform(point[i], _viewProjectionMatrix);
 				drawPoint[i] = VectorFunction::Transform(temp, _viewportMatrix);
 			}
 
@@ -117,19 +103,35 @@ void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _vi
 	Vector3 start = _origin;
 	Vector3 end = VectorFunction::Add(_origin, _diff);
 
-	Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, start);
-	Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
-	Vector3 temp = VectorFunction::Transform(start, worldViewprojectionMatrix);
+	Vector3 temp = VectorFunction::Transform(start, _viewProjectionMatrix);
 	start = VectorFunction::Transform(temp, _viewportMatrix);
 
-	worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, end);
-	worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
-	temp = VectorFunction::Transform(end, worldViewprojectionMatrix);
+	temp = VectorFunction::Transform(end, _viewProjectionMatrix);
 	end = VectorFunction::Transform(temp, _viewportMatrix);
 
 	Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, _color);
+}
+
+void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
+{
+	Vector3 center = _plane.normal * _plane.distance; // 1
+	Vector3 perpendiculars[4];
+	perpendiculars[0] = VectorFunction::Normalize(Perpendicular(_plane.normal)); // 2
+	perpendiculars[1] = { -perpendiculars[0].x, -perpendiculars[0].y, -perpendiculars[0].z }; // 3
+	perpendiculars[2] = VectorFunction::Cross(_plane.normal, perpendiculars[0]); // 4
+	perpendiculars[3] = { -perpendiculars[2].x, -perpendiculars[2].y, -perpendiculars[2].z }; // 5
+	// 6
+	Vector3 points[4];
+	for (int32_t index = 0; index < 4; ++index) {
+		Vector3 extend = VectorFunction::Multiply(2.0f, perpendiculars[index]);
+		Vector3 point = center + extend;
+
+		points[index] = VectorFunction::Transform(VectorFunction::Transform(point, _viewProjectionMatrix), _viewportMatrix);
+	}
+	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[2].x, (int)points[2].y, _color);
+	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[3].x, (int)points[3].y, _color);
+	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[2].x, (int)points[2].y, _color);
+	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[3].x, (int)points[3].y, _color);
 
 }
 
@@ -153,5 +155,32 @@ bool IsCollision(const Sphere& _s1, const Sphere& _s2)
 {
 	float distance = VectorFunction::length(VectorFunction::Subtract(_s1.center, _s2.center));
 	return distance <= _s1.radius + _s2.radius ? true : false;
+}
+
+bool IsCollision(const Sphere& _s, const Plane& _p)
+{
+	float distance = VectorFunction::Dot(_p.normal, _s.center) - _p.distance;
+	distance = distance < 0 ? -distance : distance;
+
+	if (distance <= _s.radius)
+		return true;
+	return false;
+}
+
+bool IsCollision(const Plane& _plane, const Segment& _segment)
+{
+	float dot = VectorFunction::Dot(_plane.normal, _segment.diff);
+
+	if (dot == 0.0f)
+	{
+		return false;
+	}
+
+	float t = (_plane.distance - VectorFunction::Dot(_segment.origin, _plane.normal)) / dot;
+
+	if (t < 0.0f || t>1.0f)
+		return false;
+
+	return true;
 }
 
