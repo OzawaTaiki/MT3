@@ -4,7 +4,6 @@
 #include "VectorFunction.h"
 #define _USE_MATH_DEFINES
 #include<cmath>
-#include <algorithm>
 
 struct Sphere
 {
@@ -43,6 +42,8 @@ void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, c
 //直線の描画
 void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
 
+void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
+
 Vector3 Project(const Vector3& _v1, const Vector3& _v2);
 
 Vector3 ClosestPoint(const Vector3& _point, const Segment& _segment);
@@ -53,7 +54,6 @@ Vector3 Perpendicular(const Vector3& _v);
 //球体同士の衝突判定
 bool IsCollision(const Sphere& _s1, const Sphere& _s2);
 
-//球と平面の衝突判定
 bool IsCollision(const Sphere& _s, const Plane& _p);
 
 //平面と直線の衝突判定

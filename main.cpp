@@ -55,6 +55,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat("Distance", &plane.distance, 0.01f);
 		ImGui::End();
 
+		plane.normal = VectorFunction::Normalize(plane.normal);
+
 		ImGui::Begin("Segment");
 		ImGui::DragFloat3("normal", &segment.origin.x, 0.01f);
 		ImGui::DragFloat3("Distance", &segment.diff.x, 0.01f);

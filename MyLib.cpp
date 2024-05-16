@@ -3,18 +3,17 @@
 
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix)
 {
-	const float kGridHalfWidth = 1.0f;                                          // Gridの半分の幅
+	const float kGridHalfWidth = 2.0f;                                          // Gridの半分の幅
 	const uint32_t kSubdivision = 10;                                           // 分割数
 	const float kGridEvery = (kGridHalfWidth * 2.0f) / float(kSubdivision);     // １つ分の長さ
 
-	// 置くから手前への線を引いていく
-	for (uint32_t xIndex = 0; xIndex <= kSubdivision; xIndex++)
+	// 奥から手前への線を引いていく
+	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex)
 	{
 		// 上の情報を使ってワールド座標系状の始点と終点を求める
 		float x = kGridHalfWidth - xIndex * kGridEvery;
 		Vector3 startPos = { -kGridHalfWidth,0,x };
 		Vector3 endPos = { kGridHalfWidth,0,x };
-
 		// スクリーン座標系まで変換をかける
 		Vector3 temp = VectorFunction::Transform(startPos, _viewProjectionMatrix);
 		startPos = VectorFunction::Transform(temp, _viewportMatrix);
@@ -26,12 +25,13 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 		Novice::DrawLine((int)startPos.x, (int)startPos.y, (int)endPos.x, (int)endPos.y, xIndex == (kSubdivision / 2) ? 0xff : 0xaaaaaaff);
 	}
 
-	for (uint32_t zIndex = 0; zIndex <= kSubdivision; zIndex++)
+	for (uint32_t zIndex = 0; zIndex <= kSubdivision; ++zIndex)
 	{
 		// 上の情報を使ってワールド座標系状の始点と終点を求める
-		float z = -kGridHalfWidth + zIndex * kGridEvery;
-		Vector3 startPos = { -kGridHalfWidth,0,z };
-		Vector3 endPos = { kGridHalfWidth,0,z };
+		float z = kGridHalfWidth - zIndex * kGridEvery;
+		Vector3 startPos = { z,0,-kGridHalfWidth };
+		Vector3 endPos = { z,0,kGridHalfWidth };
+
 		// スクリーン座標系まで変換をかける
 		Vector3 temp = VectorFunction::Transform(startPos, _viewProjectionMatrix);
 		startPos = VectorFunction::Transform(temp, _viewportMatrix);
@@ -49,7 +49,7 @@ void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, c
 {
 	const uint32_t kSubdivision = 10;                                   // 分割数
 	const float kLatEvery = (float)M_PI / (float)kSubdivision;          // 緯度分割１つ分の角度
-	const float kLonEvery = (float)M_PI * 2.0f / (float)kSubdivision;   // 経度分割１つ分の角度
+	const float kLonEvery = (float)M_PI * 2.0 / (float)kSubdivision;    // 経度分割１つ分の角度
 
 	//緯度の方向に分割   -π/2 ~ π/2
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++)
@@ -103,13 +103,16 @@ void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _vi
 	Vector3 start = _origin;
 	Vector3 end = VectorFunction::Add(_origin, _diff);
 
+
 	Vector3 temp = VectorFunction::Transform(start, _viewProjectionMatrix);
 	start = VectorFunction::Transform(temp, _viewportMatrix);
+
 
 	temp = VectorFunction::Transform(end, _viewProjectionMatrix);
 	end = VectorFunction::Transform(temp, _viewportMatrix);
 
 	Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, _color);
+
 }
 
 void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
@@ -125,7 +128,6 @@ void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, cons
 	for (int32_t index = 0; index < 4; ++index) {
 		Vector3 extend = VectorFunction::Multiply(2.0f, perpendiculars[index]);
 		Vector3 point = center + extend;
-
 		points[index] = VectorFunction::Transform(VectorFunction::Transform(point, _viewProjectionMatrix), _viewportMatrix);
 	}
 	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[2].x, (int)points[2].y, _color);
@@ -134,6 +136,7 @@ void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, cons
 	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[3].x, (int)points[3].y, _color);
 
 }
+
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2)
 {
@@ -149,6 +152,15 @@ Vector3 ClosestPoint(const Vector3& _point, const Segment& _segment)
 	Vector3 cp = VectorFunction::Add(_segment.origin, Project(VectorFunction::Subtract(_point, _segment.origin), _segment.diff));
 
 	return cp;
+}
+
+Vector3 Perpendicular(const Vector3& _v)
+{
+	if (_v.x != 0.0f || _v.y != 0.0f)
+	{
+		return { -_v.y,_v.x,0.0f };
+	}
+	return { 0.0f, -_v.z,_v.y };
 }
 
 bool IsCollision(const Sphere& _s1, const Sphere& _s2)
@@ -183,4 +195,3 @@ bool IsCollision(const Plane& _plane, const Segment& _segment)
 
 	return true;
 }
-
