@@ -1,4 +1,4 @@
-﻿﻿#include "MyLib.h"
+﻿#include "MyLib.h"
 #include "Novice.h"
 #include <imgui.h>
 
