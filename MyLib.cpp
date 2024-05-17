@@ -1,5 +1,6 @@
-﻿#include "MyLib.h"
+﻿﻿#include "MyLib.h"
 #include "Novice.h"
+#include <imgui.h>
 
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix)
 {
@@ -15,14 +16,8 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 		Vector3 startPos = { -kGridHalfWidth,0,x };
 		Vector3 endPos = { kGridHalfWidth,0,x };
 		// スクリーン座標系まで変換をかける
-		//Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, startPos);
-		//Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
 		Vector3 temp = VectorFunction::Transform(startPos, _viewProjectionMatrix);
 		startPos = VectorFunction::Transform(temp, _viewportMatrix);
-
-		//worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, endPos);
-		//worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
 
 		temp = VectorFunction::Transform(endPos, _viewProjectionMatrix);
 		endPos = VectorFunction::Transform(temp, _viewportMatrix);
@@ -39,14 +34,8 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 		Vector3 endPos = { z,0,kGridHalfWidth };
 
 		// スクリーン座標系まで変換をかける
-	//	Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, startPos);
-		//Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
 		Vector3 temp = VectorFunction::Transform(startPos, _viewProjectionMatrix);
 		startPos = VectorFunction::Transform(temp, _viewportMatrix);
-
-		//worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, endPos);
-		//worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
 
 		temp = VectorFunction::Transform(endPos, _viewProjectionMatrix);
 		endPos = VectorFunction::Transform(temp, _viewportMatrix);
@@ -98,9 +87,6 @@ void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, c
 			Vector3 drawPoint[3];
 			for (int i = 0; i < 3; i++)
 			{
-				//Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, point[i]);
-				//Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, );
-
 				Vector3 temp = VectorFunction::Transform(point[i], _viewProjectionMatrix);
 				drawPoint[i] = VectorFunction::Transform(temp, _viewportMatrix);
 			}
@@ -118,16 +104,12 @@ void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _vi
 	Vector3 start = _origin;
 	Vector3 end = VectorFunction::Add(_origin, _diff);
 
-	Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, start);
-	Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
 
-	Vector3 temp = VectorFunction::Transform(start, worldViewprojectionMatrix);
+	Vector3 temp = VectorFunction::Transform(start, _viewProjectionMatrix);
 	start = VectorFunction::Transform(temp, _viewportMatrix);
 
-	worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, end);
-	worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
 
-	temp = VectorFunction::Transform(end, worldViewprojectionMatrix);
+	temp = VectorFunction::Transform(end, _viewProjectionMatrix);
 	end = VectorFunction::Transform(temp, _viewportMatrix);
 
 	Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, _color);
@@ -136,18 +118,13 @@ void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _vi
 
 void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
 {
-	Vector3 center = _plane.normal * _plane.distance; // 1
+
 	Vector3 perpendiculars[4];
-	perpendiculars[0] = VectorFunction::Normalize(Perpendicular(_plane.normal)); // 2
-	perpendiculars[1] = { -perpendiculars[0].x, -perpendiculars[0].y, -perpendiculars[0].z }; // 3
-	perpendiculars[2] = VectorFunction::Cross(_plane.normal, perpendiculars[0]); // 4
-	perpendiculars[3] = { -perpendiculars[2].x, -perpendiculars[2].y, -perpendiculars[2].z }; // 5
-	// 6
+	GetPlaneVertex(_plane, perpendiculars);
+
 	Vector3 points[4];
 	for (int32_t index = 0; index < 4; ++index) {
-		Vector3 extend = VectorFunction::Multiply(2.0f, perpendiculars[index]);
-		Vector3 point = center + extend;
-		points[index] = VectorFunction::Transform(VectorFunction::Transform(point, _viewProjectionMatrix), _viewportMatrix);
+		points[index] = VectorFunction::Transform(VectorFunction::Transform(perpendiculars[index], _viewProjectionMatrix), _viewportMatrix);
 	}
 	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[2].x, (int)points[2].y, _color);
 	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[3].x, (int)points[3].y, _color);
@@ -173,6 +150,13 @@ Vector3 ClosestPoint(const Vector3& _point, const Segment& _segment)
 	return cp;
 }
 
+Vector3 ClosestPoint(const Vector3& _point, const Vector3& _lineS, const Vector3& _lineE)
+{
+	Vector3 diff = _lineE - _lineS;
+	Vector3 cp = VectorFunction::Add(_lineS, Project(VectorFunction::Subtract(_point, _lineS), diff));
+	return cp;
+}
+
 Vector3 Perpendicular(const Vector3& _v)
 {
 	if (_v.x != 0.0f || _v.y != 0.0f)
@@ -180,6 +164,19 @@ Vector3 Perpendicular(const Vector3& _v)
 		return { -_v.y,_v.x,0.0f };
 	}
 	return { 0.0f, -_v.z,_v.y };
+}
+
+void GetPlaneVertex(const Plane& _plane, Vector3* _vertex)
+{
+	Vector3 center = _plane.normal * _plane.distance;
+
+	_vertex[0] = VectorFunction::Normalize(Perpendicular(_plane.normal));
+	_vertex[1] = { -_vertex[0].x, -_vertex[0].y, -_vertex[0].z };
+	_vertex[2] = VectorFunction::Cross(_plane.normal, _vertex[0]);
+	_vertex[3] = { -_vertex[2].x, -_vertex[2].y, -_vertex[2].z };
+
+	for (int i = 0; i < 4; i++)
+		_vertex[i] = _vertex[i] * _plane.scalar + center;
 }
 
 bool IsCollision(const Sphere& _s1, const Sphere& _s2)
@@ -198,4 +195,19 @@ bool IsCollision(const Sphere& _s, const Plane& _p)
 	return false;
 }
 
+bool IsCollision(const Plane& _plane, const Segment& _segment)
+{
+	float dot = VectorFunction::Dot(_plane.normal, _segment.diff);
 
+	if (dot == 0.0f)
+	{
+		return false;
+	}
+
+	float t = (_plane.distance - VectorFunction::Dot(_segment.origin, _plane.normal)) / dot;
+
+	if (t < 0.0f || t>1.0f)
+		return false;
+
+	return true;
+}
