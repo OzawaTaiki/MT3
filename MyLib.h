@@ -5,6 +5,8 @@
 #define _USE_MATH_DEFINES
 #include<cmath>
 
+
+
 struct Sphere
 {
 	Vector3 center; //中心点
@@ -33,6 +35,7 @@ struct Plane
 {
 	Vector3 normal; // 法線
 	float distance; // 距離
+	float scalar = 2;  // 
 };
 
 //グリッドの描画
@@ -44,12 +47,23 @@ void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _vi
 
 void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
 
+//正射影ベクトル
 Vector3 Project(const Vector3& _v1, const Vector3& _v2);
 
+//最近接点
 Vector3 ClosestPoint(const Vector3& _point, const Segment& _segment);
+//最近接点
+Vector3 ClosestPoint(const Vector3& _point, const Vector3& _lineS, const Vector3& _lineE);
 
 //法線に垂直なVectorを求める
 Vector3 Perpendicular(const Vector3& _v);
+
+/// <summary>
+/// 平面の四点を求める
+/// </summary>
+/// <param name="_plane">４点を求める平面</param>
+/// <param name="_vertex">計算結果を格納するvevtor3[4] 0-2-1-3</param>
+void GetPlaneVertex(const Plane& _plane, Vector3* _vertex);
 
 //球体同士の衝突判定
 bool IsCollision(const Sphere& _s1, const Sphere& _s2);
@@ -64,3 +78,4 @@ bool IsCollision(const Plane& _plane, const Ray& _ray);
 
 //平面と線分の衝突判定
 bool IsCollision(const Plane& _plane, const Segment& _segment);
+

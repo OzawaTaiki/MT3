@@ -30,6 +30,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	plane.normal = { 0.0f,1.0f,0.0f };
 	plane.distance = 1.0f;
 
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -53,13 +54,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Begin("Plane");
 		ImGui::DragFloat3("normal", &plane.normal.x, 0.01f);
 		ImGui::DragFloat("Distance", &plane.distance, 0.01f);
+		ImGui::DragFloat("scalar", &plane.scalar, 0.01f);
 		ImGui::End();
 
 		plane.normal = VectorFunction::Normalize(plane.normal);
 
 		ImGui::Begin("Segment");
-		ImGui::DragFloat3("normal", &segment.origin.x, 0.01f);
-		ImGui::DragFloat3("Distance", &segment.diff.x, 0.01f);
+		ImGui::DragFloat3("oringin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("diff", &segment.diff.x, 0.01f);
 		ImGui::End();
 
 		bool isCollision = IsCollision(plane, segment);
@@ -76,6 +78,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawPlane(plane, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 		Drawline(segment.origin, segment.diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollision ? RED : WHITE);
+
 
 		///
 		/// ↑描画処理ここまで
