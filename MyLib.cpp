@@ -133,6 +133,20 @@ void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, cons
 
 }
 
+void DrawTriangle(const Triangle& _triangle, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
+{
+	Vector3 vertices[3];
+
+	for (int i = 0; i < 3; i++)
+	{
+		vertices[i] = VectorFunction::Transform(VectorFunction::Transform(_triangle.vertices[i], _viewProjectionMatrix), _viewportMatrix);
+	}
+	Novice::DrawTriangle(int(vertices[0].x), int(vertices[0].y),
+		int(vertices[1].x), int(vertices[1].y),
+		int(vertices[2].x), int(vertices[2].y),
+		_color, kFillModeWireFrame);
+}
+
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2)
 {
@@ -210,4 +224,63 @@ bool IsCollision(const Plane& _plane, const Segment& _segment)
 		return false;
 
 	return true;
+}
+
+bool IsCollision(const Triangle& _triangle, const Segment& _segment)
+{
+	Plane lPlane = CalculatePlane(_triangle);
+
+	float dot = VectorFunction::Dot(lPlane.normal, _segment.diff);
+
+	if (dot == 0.0f)
+	{
+		return false;
+	}
+
+	float t = (lPlane.distance - VectorFunction::Dot(_segment.origin, lPlane.normal)) / dot;
+
+	if (t < 0.0f || t>1.0f)
+		return false;
+
+	Vector3 point = _segment.origin + _segment.diff * t;
+
+	Vector3 v01 = _triangle.vertices[1] - _triangle.vertices[0];
+	Vector3 v1p = point - _triangle.vertices[1];
+
+	Vector3 v12 = _triangle.vertices[2] - _triangle.vertices[1];
+	Vector3 v2p = point - _triangle.vertices[2];
+
+	Vector3 v20 = _triangle.vertices[0] - _triangle.vertices[2];
+	Vector3 v0p = point - _triangle.vertices[0];
+
+	Vector3 cross01 = VectorFunction::Cross(v01, v1p);
+	Vector3 cross12 = VectorFunction::Cross(v12, v2p);
+	Vector3 cross20 = VectorFunction::Cross(v20, v0p);
+
+	if (VectorFunction::Dot(cross01, lPlane.normal) >= 0.0f &&
+		VectorFunction::Dot(cross12, lPlane.normal) >= 0.0f &&
+		VectorFunction::Dot(cross20, lPlane.normal) >= 0.0f)
+	{
+		return true;
+	}
+	return false;
+
+}
+
+Plane CalculatePlane(const Triangle& _triangle)
+{
+	Plane result{};
+
+	//ab,bcを求める
+	Vector3 edge1 = _triangle.vertices[1] - _triangle.vertices[0];
+	Vector3 edge2 = _triangle.vertices[2] - _triangle.vertices[1];
+
+	//法線計算
+	result.normal = VectorFunction::Cross(edge1, edge2);
+	result.normal = VectorFunction::Normalize(result.normal);
+
+	//平面方程式を用いて距離を求める
+	result.distance = VectorFunction::Dot(_triangle.vertices[0], result.normal);
+
+	return result;
 }

@@ -5,7 +5,7 @@
 #include <cmath>
 #include <imgui.h>
 
-const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_00";
+const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_02_04";
 
 static const int kWindowWidth = 1280;
 static const int kWindowHeight = 720;
@@ -22,6 +22,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
 
+
+	Triangle triangle = { {{0,0.7f,0} ,{0.5f,0,0} ,{-0.5f,0,0}} };
+
+	Segment segment;
+	segment.origin = { 0,0.5f,-1 };
+	segment.diff = { 0,0,1 };
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -37,18 +44,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		/*ImGui::Begin("Sphere");
-		ImGui::DragFloat3("Position", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("radius", &sphere.radius, 0.01f);
+		ImGui::Begin("segment");
+		ImGui::DragFloat3("origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("diff", &segment.diff.x, 0.01f);
 		ImGui::End();
 
-		ImGui::Begin("Plane");
-		ImGui::DragFloat3("normal", &plane.normal.x, 0.01f);
-		ImGui::DragFloat("Distance", &plane.distance, 0.01f);
-		ImGui::End();
-
-		plane.normal = VectorFunction::Normalize(plane.normal);*/
-
+		bool isCollsion = IsCollision(triangle, segment);
 
 		///
 		/// ↑更新処理ここまで
@@ -59,6 +60,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
+
+		DrawTriangle(triangle, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollsion ? RED : WHITE);
+		Drawline(segment.origin, segment.diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+
+
 
 		///
 		/// ↑描画処理ここまで
