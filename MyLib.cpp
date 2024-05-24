@@ -156,6 +156,39 @@ void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, cons
 
 }
 
+void DrawAABB(const AABB& _aabb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
+{
+	Vector3 vertices[8];
+
+	vertices[0] = { _aabb.min.x,_aabb.min.y ,_aabb.min.z };
+	vertices[1] = { _aabb.max.x,_aabb.min.y ,_aabb.min.z };
+	vertices[2] = { _aabb.min.x,_aabb.max.y ,_aabb.min.z };
+	vertices[3] = { _aabb.max.x,_aabb.max.y ,_aabb.min.z };
+	vertices[4] = { _aabb.min.x,_aabb.min.y ,_aabb.max.z };
+	vertices[5] = { _aabb.max.x,_aabb.min.y ,_aabb.max.z };
+	vertices[6] = { _aabb.min.x,_aabb.max.y ,_aabb.max.z };
+	vertices[7] = { _aabb.max.x,_aabb.max.y ,_aabb.max.z };
+
+	for (Vector3& v : vertices)
+	{
+		v = VectorFunction::Transform(VectorFunction::Transform(v, _viewProjectionMatrix), _viewportMatrix);
+	}
+
+	Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[1].x, (int)vertices[1].y, _color);
+	Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[2].x, (int)vertices[2].y, _color);
+	Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[4].x, (int)vertices[4].y, _color);
+	Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[3].x, (int)vertices[3].y, _color);
+	Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[5].x, (int)vertices[5].y, _color);
+	Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[6].x, (int)vertices[6].y, _color);
+	Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[3].x, (int)vertices[3].y, _color);
+	Novice::DrawLine((int)vertices[3].x, (int)vertices[3].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+	Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[5].x, (int)vertices[5].y, _color);
+	Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[6].x, (int)vertices[6].y, _color);
+	Novice::DrawLine((int)vertices[5].x, (int)vertices[5].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+	Novice::DrawLine((int)vertices[6].x, (int)vertices[6].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+
+}
+
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2)
 {

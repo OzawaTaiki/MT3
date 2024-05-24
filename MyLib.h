@@ -34,6 +34,13 @@ struct Plane
 	Vector3 normal; // 法線
 	float distance; // 距離
 };
+//矩形？
+struct AABB
+{
+	Vector3 min;
+	Vector3 max;
+};
+
 
 //グリッドの描画
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
@@ -44,13 +51,15 @@ void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _vi
 
 void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
 
+void DrawAABB(const AABB& _aabb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
+
 Vector3 Project(const Vector3& _v1, const Vector3& _v2);
 
 Vector3 ClosestPoint(const Vector3& _point, const Segment& _segment);
 
 //法線に垂直なVectorを求める
 Vector3 Perpendicular(const Vector3& _v);
- 
+
 //球体同士の衝突判定
 bool IsCollision(const Sphere& _s1, const Sphere& _s2);
 
