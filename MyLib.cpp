@@ -156,6 +156,56 @@ void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, cons
 
 }
 
+void DrawTriangle(const Triangle& _triangle, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
+{
+	Vector3 vertices[3];
+
+	for (int i = 0; i < 3; i++)
+	{
+		vertices[i] = VectorFunction::Transform(VectorFunction::Transform(_triangle.vertices[i], _viewProjectionMatrix), _viewportMatrix);
+	}
+	Novice::DrawTriangle(int(vertices[0].x), int(vertices[0].y),
+		int(vertices[1].x), int(vertices[1].y),
+		int(vertices[2].x), int(vertices[2].y),
+		_color, kFillModeWireFrame);
+}
+
+
+void DrawAABB(const AABB& _aabb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
+{
+	Vector3 vertices[8];
+
+	vertices[0] = { _aabb.min.x,_aabb.min.y ,_aabb.min.z };
+	vertices[1] = { _aabb.max.x,_aabb.min.y ,_aabb.min.z };
+	vertices[2] = { _aabb.min.x,_aabb.max.y ,_aabb.min.z };
+	vertices[3] = { _aabb.max.x,_aabb.max.y ,_aabb.min.z };
+	vertices[4] = { _aabb.min.x,_aabb.min.y ,_aabb.max.z };
+	vertices[5] = { _aabb.max.x,_aabb.min.y ,_aabb.max.z };
+	vertices[6] = { _aabb.min.x,_aabb.max.y ,_aabb.max.z };
+	vertices[7] = { _aabb.max.x,_aabb.max.y ,_aabb.max.z };
+
+	for (Vector3& v : vertices)
+	{
+		v = VectorFunction::Transform(VectorFunction::Transform(v, _viewProjectionMatrix), _viewportMatrix);
+	}
+
+	Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[1].x, (int)vertices[1].y, _color);
+	Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[2].x, (int)vertices[2].y, _color);
+	Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[4].x, (int)vertices[4].y, _color);
+	Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[3].x, (int)vertices[3].y, _color);
+	Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[5].x, (int)vertices[5].y, _color);
+	Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[6].x, (int)vertices[6].y, _color);
+	Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[3].x, (int)vertices[3].y, _color);
+	Novice::DrawLine((int)vertices[3].x, (int)vertices[3].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+	Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[5].x, (int)vertices[5].y, _color);
+	Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[6].x, (int)vertices[6].y, _color);
+	Novice::DrawLine((int)vertices[5].x, (int)vertices[5].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+	Novice::DrawLine((int)vertices[6].x, (int)vertices[6].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+
+}
+
+
+
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2)
 {
@@ -182,6 +232,19 @@ Vector3 Perpendicular(const Vector3& _v)
 	return { 0.0f, -_v.z,_v.y };
 }
 
+void GetPlaneVertex(const Plane& _plane, Vector3* _vertex)
+{
+	Vector3 center = _plane.normal * _plane.distance;
+
+	_vertex[0] = VectorFunction::Normalize(Perpendicular(_plane.normal));
+	_vertex[1] = { -_vertex[0].x, -_vertex[0].y, -_vertex[0].z };
+	_vertex[2] = VectorFunction::Cross(_plane.normal, _vertex[0]);
+	_vertex[3] = { -_vertex[2].x, -_vertex[2].y, -_vertex[2].z };
+
+	for (int i = 0; i < 4; i++)
+		_vertex[i] = _vertex[i] * _plane.scalar + center;
+}
+
 bool IsCollision(const Sphere& _s1, const Sphere& _s2)
 {
 	float distance = VectorFunction::length(VectorFunction::Subtract(_s1.center, _s2.center));
@@ -198,4 +261,102 @@ bool IsCollision(const Sphere& _s, const Plane& _p)
 	return false;
 }
 
+bool IsCollision(const Plane& _plane, const Segment& _segment)
+{
+	float dot = VectorFunction::Dot(_plane.normal, _segment.diff);
 
+	if (dot == 0.0f)
+	{
+		return false;
+	}
+
+	float t = (_plane.distance - VectorFunction::Dot(_segment.origin, _plane.normal)) / dot;
+
+	if (t < 0.0f || t>1.0f)
+		return false;
+
+	return true;
+}
+
+bool IsCollision(const Triangle& _triangle, const Segment& _segment)
+{
+	Plane lPlane = CalculatePlane(_triangle);
+
+	float dot = VectorFunction::Dot(lPlane.normal, _segment.diff);
+
+	if (dot == 0.0f)
+	{
+		return false;
+	}
+
+	float t = (lPlane.distance - VectorFunction::Dot(_segment.origin, lPlane.normal)) / dot;
+
+	if (t < 0.0f || t>1.0f)
+		return false;
+
+	Vector3 point = _segment.origin + _segment.diff * t;
+
+	Vector3 v01 = _triangle.vertices[1] - _triangle.vertices[0];
+	Vector3 v1p = point - _triangle.vertices[1];
+
+	Vector3 v12 = _triangle.vertices[2] - _triangle.vertices[1];
+	Vector3 v2p = point - _triangle.vertices[2];
+
+	Vector3 v20 = _triangle.vertices[0] - _triangle.vertices[2];
+	Vector3 v0p = point - _triangle.vertices[0];
+
+	Vector3 cross01 = VectorFunction::Cross(v01, v1p);
+	Vector3 cross12 = VectorFunction::Cross(v12, v2p);
+	Vector3 cross20 = VectorFunction::Cross(v20, v0p);
+
+	if (VectorFunction::Dot(cross01, lPlane.normal) >= 0.0f &&
+		VectorFunction::Dot(cross12, lPlane.normal) >= 0.0f &&
+		VectorFunction::Dot(cross20, lPlane.normal) >= 0.0f)
+	{
+		return true;
+	}
+	return false;
+
+}
+
+bool IsCollision(const AABB& _a, const AABB& _b)
+{
+
+
+	if ((_a.min.x <= _b.max.x && _a.max.x >= _b.min.x) && // x
+		(_a.min.y <= _b.max.y && _a.max.y >= _b.min.y) && // y
+		(_a.min.z <= _b.max.z && _a.max.z >= _b.min.z)) { // z
+		//衝突
+		return true;
+	}
+
+	return false;
+}
+
+Plane CalculatePlane(const Triangle& _triangle)
+{
+	Plane result{};
+
+	//ab,bcを求める
+	Vector3 edge1 = _triangle.vertices[1] - _triangle.vertices[0];
+	Vector3 edge2 = _triangle.vertices[2] - _triangle.vertices[1];
+
+	//法線計算
+	result.normal = VectorFunction::Cross(edge1, edge2);
+	result.normal = VectorFunction::Normalize(result.normal);
+
+	//平面方程式を用いて距離を求める
+	result.distance = VectorFunction::Dot(_triangle.vertices[0], result.normal);
+
+	return result;
+}
+
+void AABB::Update()
+{
+	this->min.x = (std::min)(this->min.x, this->max.x);
+	this->max.x = (std::max)(this->min.x, this->max.x);
+	this->min.y = (std::min)(this->min.y, this->max.y);
+	this->max.y = (std::max)(this->min.y, this->max.y);
+	this->min.z = (std::min)(this->min.z, this->max.z);
+	this->max.z = (std::max)(this->min.z, this->max.z);
+}
