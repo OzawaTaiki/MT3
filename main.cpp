@@ -22,6 +22,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
 
+	AABB aabb;
+	aabb.min = { 0.0f,0.0f ,0.0f };
+	aabb.max = { 0.5f,0.5f ,0.5f };
+
+	Sphere sphere;
+	sphere.center = { 1.0f,1.0f ,0.0f };
+	sphere.radius = 0.5f;
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -37,6 +45,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
+		ImGui::Begin("Sphere");
+		ImGui::DragFloat3("Position", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("radius", &sphere.radius, 0.01f);
+		ImGui::End();
+
+		ImGui::Begin("AABB");
+		ImGui::DragFloat3("Min", &aabb.min.x, 0.01f);
+		ImGui::DragFloat3("Max", &aabb.max.x, 0.01f);
+		ImGui::End();
+		aabb.Update();
+
 		/*ImGui::Begin("Sphere");
 		ImGui::DragFloat3("Position", &sphere.center.x, 0.01f);
 		ImGui::DragFloat("radius", &sphere.radius, 0.01f);
@@ -50,6 +69,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		plane.normal = VectorFunction::Normalize(plane.normal);*/
 
 
+		bool isCollision = IsCollision(aabb, sphere);
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -59,6 +80,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
+
+		DrawSphere(sphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		DrawAABB(aabb, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollision ? RED : WHITE);
 
 		///
 		/// ↑描画処理ここまで

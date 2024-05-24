@@ -46,6 +46,8 @@ struct AABB
 {
 	Vector3 min;
 	Vector3 max;
+
+public:
 	void Update();
 };
 //グリッドの描画
@@ -90,6 +92,9 @@ bool IsCollision(const Triangle& _triangle, const Segment& _segment);
 
 //AABB同士の衝突判定
 bool IsCollision(const AABB& _a, const AABB& _b);
+
+//AABBと球の衝突判定
+bool IsCollision(const AABB& _a, const Sphere& _s);
 
 //三角形のある平面を計算
 Plane CalculatePlane(const Triangle& _triangle);

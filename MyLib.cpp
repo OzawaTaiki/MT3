@@ -1,5 +1,6 @@
 ﻿#include "MyLib.h"
 #include "Novice.h"
+#include <algorithm>
 
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix)
 {
@@ -321,12 +322,28 @@ bool IsCollision(const Triangle& _triangle, const Segment& _segment)
 
 bool IsCollision(const AABB& _a, const AABB& _b)
 {
-
-
 	if ((_a.min.x <= _b.max.x && _a.max.x >= _b.min.x) && // x
 		(_a.min.y <= _b.max.y && _a.max.y >= _b.min.y) && // y
 		(_a.min.z <= _b.max.z && _a.max.z >= _b.min.z)) { // z
 		//衝突
+		return true;
+	}
+
+	return false;
+}
+
+bool IsCollision(const AABB& _a, const Sphere& _s)
+{
+
+	Vector3 closestPoint;
+	closestPoint.x = std::clamp(_s.center.x, _a.min.x, _a.max.x);
+	closestPoint.y = std::clamp(_s.center.y, _a.min.y, _a.max.y);
+	closestPoint.z = std::clamp(_s.center.z, _a.min.z, _a.max.z);
+
+	float distance = VectorFunction::length(closestPoint - _s.center);
+
+	if (distance <= _s.radius)
+	{
 		return true;
 	}
 
