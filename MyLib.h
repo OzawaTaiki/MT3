@@ -39,6 +39,7 @@ struct AABB
 {
 	Vector3 min;
 	Vector3 max;
+	void Update();
 };
 
 
@@ -64,3 +65,6 @@ Vector3 Perpendicular(const Vector3& _v);
 bool IsCollision(const Sphere& _s1, const Sphere& _s2);
 
 bool IsCollision(const Sphere& _s, const Plane& _p);
+
+//AABB同士の衝突判定
+bool IsCollision(const AABB& _a, const AABB& _b);

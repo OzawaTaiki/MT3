@@ -231,4 +231,26 @@ bool IsCollision(const Sphere& _s, const Plane& _p)
 	return false;
 }
 
+bool IsCollision(const AABB& _a, const AABB& _b)
+{
+	
 
+	if ((_a.min.x <= _b.max.x && _a.max.x >= _b.min.x) && // x
+		(_a.min.y <= _b.max.y && _a.max.y >= _b.min.y) && // y
+		(_a.min.z <= _b.max.z && _a.max.z >= _b.min.z)) { // z
+		//衝突
+		return true;
+	}
+
+	return false;
+}
+
+void AABB::Update()
+{
+	this->min.x = (std::min)(this->min.x, this->max.x);
+	this->max.x = (std::max)(this->min.x, this->max.x);
+	this->min.y = (std::min)(this->min.y, this->max.y);
+	this->max.y = (std::max)(this->min.y, this->max.y);
+	this->min.z = (std::min)(this->min.z, this->max.z);
+	this->max.z = (std::max)(this->min.z, this->max.z);
+}

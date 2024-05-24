@@ -22,9 +22,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
 
-	AABB aabb = {
+	AABB aabb1 = {
 		{ -0.5f,-0.5f ,-0.5f},
 		{0.0f,0.0f,0.0f}
+	};
+
+	AABB aabb2 = {
+		{  0.2f, 0.2f , 0.2f},
+		{1.0f,1.0f,1.0f}
 	};
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -54,6 +59,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		plane.normal = VectorFunction::Normalize(plane.normal);*/
 
+		ImGui::Begin("AABB");
+		ImGui::DragFloat3("AABB1_Min", &aabb1.min.x, 0.01f);
+		ImGui::DragFloat3("AABB1_Max", &aabb1.max.x, 0.01f);
+		ImGui::DragFloat3("AABB2_Min", &aabb2.min.x, 0.01f);
+		ImGui::DragFloat3("AABB2_Max", &aabb2.max.x, 0.01f);
+		ImGui::End();
+
+		aabb1.Update();
+		aabb2.Update();
+
+		bool isCollision = IsCollision(aabb1, aabb2);
+
 
 		///
 		/// ↑更新処理ここまで
@@ -65,7 +82,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawAABB(aabb, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		DrawAABB(aabb1, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollision ? RED : WHITE);
+		DrawAABB(aabb2, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///
 		/// ↑描画処理ここまで
