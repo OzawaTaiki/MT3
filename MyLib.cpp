@@ -417,17 +417,8 @@ bool IsCollision(const AABB& _aabb, const Segment& _segment)
 
 bool IsCollision(const OBB& _obb, const Sphere& _sphere)
 {
-	Vector3 obbScale = { 1.0f,1.0f,1.0f };
-	Vector3 obbRotate = { 0.0f,0.0f,0.0f };
-
-	Matrix4x4 obbWorldMat = MatrixFunction::MakeAffineMatrix(obbScale, obbRotate, _obb.center);
-
-	return IsCollision(_obb, _sphere, obbWorldMat);
-}
-
-bool IsCollision(const OBB& _obb, const Sphere& _sphere, const Matrix4x4& _obbWorldMat)
-{
-	Matrix4x4 obbWorldMatInv = MatrixFunction::Inverse(_obbWorldMat);
+	Matrix4x4 obbWolrdMat = MatrixFunction::MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
+	Matrix4x4 obbWorldMatInv = MatrixFunction::Inverse(obbWolrdMat);
 
 	Vector3  centerInOBBLocalSphere = VectorFunction::Transform(_sphere.center, obbWorldMatInv);
 	AABB aabbOBBLocal{ .min = -_obb.size,.max = _obb.size };
@@ -435,6 +426,24 @@ bool IsCollision(const OBB& _obb, const Sphere& _sphere, const Matrix4x4& _obbWo
 
 	return IsCollision(aabbOBBLocal, sphereOBBLocal);
 
+}
+
+bool IsCollision(const OBB& _obb, const Segment& _segment)
+{
+	Matrix4x4 obbWolrdMat = MatrixFunction::MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
+	Matrix4x4 obbWorldMatInv = MatrixFunction::Inverse(obbWolrdMat);
+	Vector3 localOrigin = VectorFunction::Transform(_segment.origin, obbWorldMatInv);
+	Vector3 localEnd = VectorFunction::Transform(_segment.origin + _segment.diff, obbWorldMatInv);
+
+	AABB localAABB{
+		{-_obb.size.x, -_obb.size.y, -_obb.size.z},
+		{+_obb.size.x, +_obb.size.y, +_obb.size.z},
+	};
+	Segment localSegment;
+	localSegment.origin = localOrigin;
+	localSegment.diff = localEnd - localOrigin;
+
+	return IsCollision(localAABB, localSegment);
 }
 
 Plane CalculatePlane(const Triangle& _triangle)
@@ -465,9 +474,9 @@ void AABB::Update()
 	this->max.z = (std::max)(this->min.z, this->max.z);
 }
 
-void OBB::Calculateorientations(const Vector3& _rotate)
+void OBB::Calculateorientations()
 {
-	Matrix4x4 rotateMatrix = MatrixFunction::MakeRotateMatrix(_rotate);
+	Matrix4x4 rotateMatrix = MatrixFunction::MakeRotateMatrix(this->rotate);
 
 
 	this->orientations[0].x = rotateMatrix.m[0][0];

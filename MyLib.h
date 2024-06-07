@@ -56,8 +56,10 @@ struct OBB
 	Vector3 center;				//中心座標
 	Vector3 orientations[3];	//座標軸 正規化・直行必須
 	Vector3 size;				//サイズ
+	Vector3 rotate;				//回転角
+
 public:
-	void Calculateorientations(const Vector3& _rotate);
+	void Calculateorientations();
 };
 //グリッドの描画
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
@@ -113,7 +115,8 @@ bool IsCollision(const AABB& _aabb, const Segment& _segment);
 //obbと球の衝突判定
 bool IsCollision(const OBB& _obb, const Sphere& _sphere);
 
-bool IsCollision(const OBB& _obb, const Sphere& _sphere,const Matrix4x4& _obbWorldMat);
+bool IsCollision(const OBB& _obb, const Segment& _segment);
+
 
 //三角形のある平面を計算
 Plane CalculatePlane(const Triangle& _triangle);
