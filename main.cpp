@@ -22,20 +22,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
 
-	Vector3 obbRotate = { 0.0f,0.0f,0.0f };
-	Vector3 obbScale = { 1.0f,1.0f,1.0f };
 	OBB obb{
 		.center{-1.0f, 0.0f, 0.0f},
 		.orientations = {{1.0f, 0.0f, 0.0f},
 						{0.0f, 1.0f, 0.0f},
 						{0.0f, 0.0f, 1.0f}},
-		.size{0.5f, 0.5f, 0.5f}
+		.size{0.5f, 0.5f, 0.5f},
+		.rotate{0.0f, 0.0f, 0.0f}
 
 	};
 
-	Sphere sphere{
-		.center{0.0f,0.0f,0.0f},
-		.radius{0.5f}
+	Segment segment{
+		.origin{-0.8f,-0.3f,0.0f},
+		.diff{0.5f,0.5f,0.5f}
 	};
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -59,14 +58,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("orientations[1]", &obb.orientations[1].x, 0.01f);
 		ImGui::DragFloat3("orientations[2]", &obb.orientations[2].x, 0.01f);
 		ImGui::DragFloat3("size", &obb.size.x, 0.01f);
-		ImGui::DragFloat3("rotate", &obbRotate.x, 0.01f);
+		ImGui::DragFloat3("rotate", &obb.rotate.x, 0.01f);
 		ImGui::End();
-		obb.Calculateorientations(obbRotate);
+		obb.Calculateorientations();
 
-		ImGui::Begin("sphere");
+		/*ImGui::Begin("sphere");
 		ImGui::DragFloat3("center", &sphere.center.x, 0.01f);
 		ImGui::DragFloat("radius", &sphere.radius, 0.01f);
-		ImGui::End();
+		ImGui::End();*/
 
 		/*ImGui::Begin("AABB");
 		ImGui::DragFloat3("Min", &aabb.min.x, 0.01f);
@@ -74,10 +73,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::End();
 		aabb.Update();*/
 
-		/*ImGui::Begin("segment");
+		ImGui::Begin("segment");
 		ImGui::DragFloat3("origin", &segment.origin.x, 0.01f);
 		ImGui::DragFloat3("diff", &segment.diff.x, 0.01f);
-		ImGui::End();*/
+		ImGui::End();
 
 		/*ImGui::Begin("Plane");
 		ImGui::DragFloat3("normal", &plane.normal.x, 0.01f);
@@ -86,7 +85,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		plane.normal = VectorFunction::Normalize(plane.normal);*/
 
-		bool isCollisin = IsCollision(obb, sphere, MatrixFunction::MakeAffineMatrix(obbScale, obbRotate, obb.center));
+		bool isCollisin = IsCollision(obb, segment);
 
 		///
 		/// ↑更新処理ここまで
@@ -99,9 +98,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
 		DrawOBB(obb, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollisin ? RED : WHITE);
-		DrawSphere(sphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		Drawline(segment.origin, segment.diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		//DrawSphere(sphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 		//DrawAABB(aabb, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollisin ? RED : WHITE);
-		//Drawline(segment.origin, segment.diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///
 		/// ↑描画処理ここまで
