@@ -26,9 +26,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	aabb.min = { 0.0f,0.0f ,0.0f };
 	aabb.max = { 0.5f,0.5f ,0.5f };
 
-	Sphere sphere;
-	sphere.center = { 1.0f,1.0f ,0.0f };
-	sphere.radius = 0.5f;
+	Segment segment;
+	segment.diff = { 2.0f,-0.5f,0.0f };
+	segment.origin = { 0.7f,0.3f,0.0f };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -45,31 +45,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		ImGui::Begin("Sphere");
-		ImGui::DragFloat3("Position", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("radius", &sphere.radius, 0.01f);
-		ImGui::End();
-
 		ImGui::Begin("AABB");
 		ImGui::DragFloat3("Min", &aabb.min.x, 0.01f);
 		ImGui::DragFloat3("Max", &aabb.max.x, 0.01f);
 		ImGui::End();
 		aabb.Update();
 
-		/*ImGui::Begin("Sphere");
-		ImGui::DragFloat3("Position", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("radius", &sphere.radius, 0.01f);
+		ImGui::Begin("segment");
+		ImGui::DragFloat3("origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("diff", &segment.diff.x, 0.01f);
 		ImGui::End();
 
-		ImGui::Begin("Plane");
+		/*ImGui::Begin("Plane");
 		ImGui::DragFloat3("normal", &plane.normal.x, 0.01f);
 		ImGui::DragFloat("Distance", &plane.distance, 0.01f);
 		ImGui::End();
 
 		plane.normal = VectorFunction::Normalize(plane.normal);*/
 
-
-		bool isCollision = IsCollision(aabb, sphere);
+		bool isCollisin = IsCollision(aabb, segment);
 
 		///
 		/// ↑更新処理ここまで
@@ -81,8 +75,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawSphere(sphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
-		DrawAABB(aabb, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollision ? RED : WHITE);
+		DrawAABB(aabb, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollisin ? RED : WHITE);
+		Drawline(segment.origin, segment.diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///
 		/// ↑描画処理ここまで

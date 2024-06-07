@@ -1,6 +1,9 @@
-﻿#include "MyLib.h"
+﻿#define NOMINMAX
+#include "MyLib.h"
 #include "Novice.h"
 #include <algorithm>
+
+#include <imgui.h>
 
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix)
 {
@@ -119,16 +122,11 @@ void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _vi
 	Vector3 start = _origin;
 	Vector3 end = VectorFunction::Add(_origin, _diff);
 
-	Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, start);
-	Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
-	Vector3 temp = VectorFunction::Transform(start, worldViewprojectionMatrix);
+	Vector3 temp = VectorFunction::Transform(start, _viewProjectionMatrix);
 	start = VectorFunction::Transform(temp, _viewportMatrix);
 
-	worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, end);
-	worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
 
-	temp = VectorFunction::Transform(end, worldViewprojectionMatrix);
+	temp = VectorFunction::Transform(end, _viewProjectionMatrix);
 	end = VectorFunction::Transform(temp, _viewportMatrix);
 
 	Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, _color);
@@ -204,9 +202,6 @@ void DrawAABB(const AABB& _aabb, const Matrix4x4& _viewProjectionMatrix, const M
 	Novice::DrawLine((int)vertices[6].x, (int)vertices[6].y, (int)vertices[7].x, (int)vertices[7].y, _color);
 
 }
-
-
-
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2)
 {
@@ -344,6 +339,49 @@ bool IsCollision(const AABB& _a, const Sphere& _s)
 
 	if (distance <= _s.radius)
 	{
+		return true;
+	}
+
+	return false;
+}
+
+bool IsCollision(const AABB& _aabb, const Segment& _segment)
+{
+	Vector3 tminVec;
+	Vector3 tmaxVec;
+
+	tminVec.y = (_aabb.min.y - _segment.origin.y) / _segment.diff.y;
+	tminVec.x = (_aabb.min.x - _segment.origin.x) / _segment.diff.x;
+	tminVec.z = (_aabb.min.z - _segment.origin.z) / _segment.diff.z;
+
+
+	tmaxVec.x = (_aabb.max.x - _segment.origin.x) / _segment.diff.x;
+	tmaxVec.y = (_aabb.max.y - _segment.origin.y) / _segment.diff.y;
+	tmaxVec.z = (_aabb.max.z - _segment.origin.z) / _segment.diff.z;
+
+	Vector3 tNear;
+	tNear.x = std::min(tminVec.x, tmaxVec.x);
+	tNear.y = std::min(tminVec.y, tmaxVec.y);
+	tNear.z = std::min(tminVec.z, tmaxVec.z);
+
+	Vector3 tFar;
+	tFar.x = std::max(tminVec.x, tmaxVec.x);
+	tFar.y = std::max(tminVec.y, tmaxVec.y);
+	tFar.z = std::max(tminVec.z, tmaxVec.z);
+
+	float tmin = std::max(std::max(tNear.x, tNear.y), tNear.z);
+	float tmax = std::min(std::min(tFar.x, tFar.y), tFar.z);
+
+	ImGui::Begin("aaa");
+	ImGui::Text("tmin : %.3f", tmin);
+	ImGui::Text("tmax ; %.3f", tmax);
+	ImGui::End();
+
+	if (tmin <= tmax &&
+		tmax >= 0.0f &&
+		tmin <= 1.0f)
+	{
+		//衝突
 		return true;
 	}
 
