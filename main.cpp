@@ -5,7 +5,7 @@
 #include <cmath>
 #include <imgui.h>
 
-const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_00_00";
+const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_02_08";
 
 static const int kWindowWidth = 1280;
 static const int kWindowHeight = 720;
@@ -22,13 +22,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
 
-	AABB aabb;
-	aabb.min = { 0.0f,0.0f ,0.0f };
-	aabb.max = { 0.5f,0.5f ,0.5f };
+	Vector3 obbRotate = { 0.0f,0.0f,0.0f };
+	Vector3 obbScale = { 1.0f,1.0f,1.0f };
+	OBB obb{
+		.center{-1.0f, 0.0f, 0.0f},
+		.orientations = {{1.0f, 0.0f, 0.0f},
+						{0.0f, 1.0f, 0.0f},
+						{0.0f, 0.0f, 1.0f}},
+		.size{0.5f, 0.5f, 0.5f}
 
-	Segment segment;
-	segment.diff = { 2.0f,-0.5f,0.0f };
-	segment.origin = { 0.7f,0.3f,0.0f };
+	};
+
+	Sphere sphere{
+		.center{0.0f,0.0f,0.0f},
+		.radius{0.5f}
+	};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -45,16 +53,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		ImGui::Begin("AABB");
+		ImGui::Begin("OBB");
+		ImGui::DragFloat3("center", &obb.center.x, 0.01f);
+		ImGui::DragFloat3("orientations[0]", &obb.orientations[0].x, 0.01f);
+		ImGui::DragFloat3("orientations[1]", &obb.orientations[1].x, 0.01f);
+		ImGui::DragFloat3("orientations[2]", &obb.orientations[2].x, 0.01f);
+		ImGui::DragFloat3("size", &obb.size.x, 0.01f);
+		ImGui::DragFloat3("rotate", &obbRotate.x, 0.01f);
+		ImGui::End();
+		obb.Calculateorientations(obbRotate);
+
+		ImGui::Begin("sphere");
+		ImGui::DragFloat3("center", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("radius", &sphere.radius, 0.01f);
+		ImGui::End();
+
+		/*ImGui::Begin("AABB");
 		ImGui::DragFloat3("Min", &aabb.min.x, 0.01f);
 		ImGui::DragFloat3("Max", &aabb.max.x, 0.01f);
 		ImGui::End();
-		aabb.Update();
+		aabb.Update();*/
 
-		ImGui::Begin("segment");
+		/*ImGui::Begin("segment");
 		ImGui::DragFloat3("origin", &segment.origin.x, 0.01f);
 		ImGui::DragFloat3("diff", &segment.diff.x, 0.01f);
-		ImGui::End();
+		ImGui::End();*/
 
 		/*ImGui::Begin("Plane");
 		ImGui::DragFloat3("normal", &plane.normal.x, 0.01f);
@@ -63,7 +86,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		plane.normal = VectorFunction::Normalize(plane.normal);*/
 
-		bool isCollisin = IsCollision(aabb, segment);
+		bool isCollisin = IsCollision(obb, sphere, MatrixFunction::MakeAffineMatrix(obbScale, obbRotate, obb.center));
 
 		///
 		/// ↑更新処理ここまで
@@ -75,8 +98,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawAABB(aabb, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollisin ? RED : WHITE);
-		Drawline(segment.origin, segment.diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		DrawOBB(obb, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollisin ? RED : WHITE);
+		DrawSphere(sphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		//DrawAABB(aabb, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollisin ? RED : WHITE);
+		//Drawline(segment.origin, segment.diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///
 		/// ↑描画処理ここまで

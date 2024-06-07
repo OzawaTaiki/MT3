@@ -137,3 +137,8 @@ Vector3 operator*(const Vector3& _v, float _s)
 {
 	return Vector3(_v.x * _s, _v.y * _s, _v.z * _s);
 }
+
+Vector3 operator-(const Vector3& _v)
+{
+	return Vector3(-_v.x, -_v.y, -_v.z);
+}
