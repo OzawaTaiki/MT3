@@ -96,5 +96,8 @@ bool IsCollision(const AABB& _a, const AABB& _b);
 //AABBと球の衝突判定
 bool IsCollision(const AABB& _a, const Sphere& _s);
 
+//AABBと線分の衝突判定
+bool IsCollision(const AABB& _aabb, const Segment& _segment);
+
 //三角形のある平面を計算
 Plane CalculatePlane(const Triangle& _triangle);
