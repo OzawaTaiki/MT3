@@ -18,15 +18,10 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 		float x = kGridHalfWidth - xIndex * kGridEvery;
 		Vector3 startPos = { -kGridHalfWidth,0,x };
 		Vector3 endPos = { kGridHalfWidth,0,x };
-		// スクリーン座標系まで変換をかける
-		//Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, startPos);
-		//Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
 
+		// スクリーン座標系まで変換をかける
 		Vector3 temp = VectorFunction::Transform(startPos, _viewProjectionMatrix);
 		startPos = VectorFunction::Transform(temp, _viewportMatrix);
-
-		//worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, endPos);
-		//worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
 
 		temp = VectorFunction::Transform(endPos, _viewProjectionMatrix);
 		endPos = VectorFunction::Transform(temp, _viewportMatrix);
@@ -43,14 +38,9 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 		Vector3 endPos = { z,0,kGridHalfWidth };
 
 		// スクリーン座標系まで変換をかける
-	//	Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, startPos);
-		//Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
-
 		Vector3 temp = VectorFunction::Transform(startPos, _viewProjectionMatrix);
 		startPos = VectorFunction::Transform(temp, _viewportMatrix);
 
-		//worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, endPos);
-		//worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, _viewProjectionMatrix);
 
 		temp = VectorFunction::Transform(endPos, _viewProjectionMatrix);
 		endPos = VectorFunction::Transform(temp, _viewportMatrix);
@@ -102,9 +92,6 @@ void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, c
 			Vector3 drawPoint[3];
 			for (int i = 0; i < 3; i++)
 			{
-				//Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, point[i]);
-				//Matrix4x4 worldViewprojectionMatrix = MatrixFunction::Multiply(worldMatrix, );
-
 				Vector3 temp = VectorFunction::Transform(point[i], _viewProjectionMatrix);
 				drawPoint[i] = VectorFunction::Transform(temp, _viewportMatrix);
 			}
@@ -201,6 +188,43 @@ void DrawAABB(const AABB& _aabb, const Matrix4x4& _viewProjectionMatrix, const M
 	Novice::DrawLine((int)vertices[5].x, (int)vertices[5].y, (int)vertices[7].x, (int)vertices[7].y, _color);
 	Novice::DrawLine((int)vertices[6].x, (int)vertices[6].y, (int)vertices[7].x, (int)vertices[7].y, _color);
 
+}
+
+void DrawOBB(const OBB& _obb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
+{
+	Vector3 vertices[8];
+
+	Vector3 rotateAxis[3];
+	rotateAxis[0] = _obb.orientations[0] * _obb.size.x;
+	rotateAxis[1] = _obb.orientations[1] * _obb.size.y;
+	rotateAxis[2] = _obb.orientations[2] * _obb.size.z;
+
+	vertices[0] = _obb.center + rotateAxis[0] + rotateAxis[1] + rotateAxis[2];
+	vertices[1] = _obb.center + rotateAxis[0] + rotateAxis[1] - rotateAxis[2];
+	vertices[2] = _obb.center + rotateAxis[0] - rotateAxis[1] + rotateAxis[2];
+	vertices[3] = _obb.center + rotateAxis[0] - rotateAxis[1] - rotateAxis[2];
+	vertices[4] = _obb.center - rotateAxis[0] + rotateAxis[1] + rotateAxis[2];
+	vertices[5] = _obb.center - rotateAxis[0] + rotateAxis[1] - rotateAxis[2];
+	vertices[6] = _obb.center - rotateAxis[0] - rotateAxis[1] + rotateAxis[2];
+	vertices[7] = _obb.center - rotateAxis[0] - rotateAxis[1] - rotateAxis[2];
+
+	for (Vector3& v : vertices)
+	{
+		v = VectorFunction::Transform(VectorFunction::Transform(v, _viewProjectionMatrix), _viewportMatrix);
+	}
+
+	Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[1].x, (int)vertices[1].y, _color);
+	Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[2].x, (int)vertices[2].y, _color);
+	Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[4].x, (int)vertices[4].y, _color);
+	Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[3].x, (int)vertices[3].y, _color);
+	Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[5].x, (int)vertices[5].y, _color);
+	Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[6].x, (int)vertices[6].y, _color);
+	Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[3].x, (int)vertices[3].y, _color);
+	Novice::DrawLine((int)vertices[3].x, (int)vertices[3].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+	Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[5].x, (int)vertices[5].y, _color);
+	Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[6].x, (int)vertices[6].y, _color);
+	Novice::DrawLine((int)vertices[5].x, (int)vertices[5].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+	Novice::DrawLine((int)vertices[6].x, (int)vertices[6].y, (int)vertices[7].x, (int)vertices[7].y, _color);
 }
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2)
@@ -354,7 +378,6 @@ bool IsCollision(const AABB& _aabb, const Segment& _segment)
 	tminVec.x = (_aabb.min.x - _segment.origin.x) / _segment.diff.x;
 	tminVec.z = (_aabb.min.z - _segment.origin.z) / _segment.diff.z;
 
-
 	tmaxVec.x = (_aabb.max.x - _segment.origin.x) / _segment.diff.x;
 	tmaxVec.y = (_aabb.max.y - _segment.origin.y) / _segment.diff.y;
 	tmaxVec.z = (_aabb.max.z - _segment.origin.z) / _segment.diff.z;
@@ -372,10 +395,14 @@ bool IsCollision(const AABB& _aabb, const Segment& _segment)
 	float tmin = std::max(std::max(tNear.x, tNear.y), tNear.z);
 	float tmax = std::min(std::min(tFar.x, tFar.y), tFar.z);
 
+#ifdef _DEBUG
+
 	ImGui::Begin("aaa");
 	ImGui::Text("tmin : %.3f", tmin);
 	ImGui::Text("tmax ; %.3f", tmax);
 	ImGui::End();
+
+#endif // _DEBUG
 
 	if (tmin <= tmax &&
 		tmax >= 0.0f &&
@@ -386,6 +413,28 @@ bool IsCollision(const AABB& _aabb, const Segment& _segment)
 	}
 
 	return false;
+}
+
+bool IsCollision(const OBB& _obb, const Sphere& _sphere)
+{
+	Vector3 obbScale = { 1.0f,1.0f,1.0f };
+	Vector3 obbRotate = { 0.0f,0.0f,0.0f };
+
+	Matrix4x4 obbWorldMat = MatrixFunction::MakeAffineMatrix(obbScale, obbRotate, _obb.center);
+
+	return IsCollision(_obb, _sphere, obbWorldMat);
+}
+
+bool IsCollision(const OBB& _obb, const Sphere& _sphere, const Matrix4x4& _obbWorldMat)
+{
+	Matrix4x4 obbWorldMatInv = MatrixFunction::Inverse(_obbWorldMat);
+
+	Vector3  centerInOBBLocalSphere = VectorFunction::Transform(_sphere.center, obbWorldMatInv);
+	AABB aabbOBBLocal{ .min = -_obb.size,.max = _obb.size };
+	Sphere sphereOBBLocal{ centerInOBBLocalSphere,_sphere.radius };
+
+	return IsCollision(aabbOBBLocal, sphereOBBLocal);
+
 }
 
 Plane CalculatePlane(const Triangle& _triangle)
@@ -414,4 +463,26 @@ void AABB::Update()
 	this->max.y = (std::max)(this->min.y, this->max.y);
 	this->min.z = (std::min)(this->min.z, this->max.z);
 	this->max.z = (std::max)(this->min.z, this->max.z);
+}
+
+void OBB::Calculateorientations(const Vector3& _rotate)
+{
+	Matrix4x4 rotateMatrix = MatrixFunction::MakeRotateMatrix(_rotate);
+
+
+	this->orientations[0].x = rotateMatrix.m[0][0];
+	this->orientations[0].y = rotateMatrix.m[0][1];
+	this->orientations[0].z = rotateMatrix.m[0][2];
+
+	this->orientations[1].x = rotateMatrix.m[1][0];
+	this->orientations[1].y = rotateMatrix.m[1][1];
+	this->orientations[1].z = rotateMatrix.m[1][2];
+
+	this->orientations[2].x = rotateMatrix.m[2][0];
+	this->orientations[2].y = rotateMatrix.m[2][1];
+	this->orientations[2].z = rotateMatrix.m[2][2];
+
+	this->orientations[0] = VectorFunction::Normalize(this->orientations[0]);
+	this->orientations[1] = VectorFunction::Normalize(this->orientations[1]);
+	this->orientations[2] = VectorFunction::Normalize(this->orientations[2]);
 }

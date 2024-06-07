@@ -50,6 +50,15 @@ struct AABB
 public:
 	void Update();
 };
+
+struct OBB
+{
+	Vector3 center;				//中心座標
+	Vector3 orientations[3];	//座標軸 正規化・直行必須
+	Vector3 size;				//サイズ
+public:
+	void Calculateorientations(const Vector3& _rotate);
+};
 //グリッドの描画
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
 //球体の描画
@@ -63,6 +72,8 @@ void DrawTriangle(const Triangle& _triangle, const Matrix4x4& _viewProjectionMat
 
 
 void DrawAABB(const AABB& _aabb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
+
+void DrawOBB(const OBB& _obb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2);
 
@@ -98,6 +109,11 @@ bool IsCollision(const AABB& _a, const Sphere& _s);
 
 //AABBと線分の衝突判定
 bool IsCollision(const AABB& _aabb, const Segment& _segment);
+
+//obbと球の衝突判定
+bool IsCollision(const OBB& _obb, const Sphere& _sphere);
+
+bool IsCollision(const OBB& _obb, const Sphere& _sphere,const Matrix4x4& _obbWorldMat);
 
 //三角形のある平面を計算
 Plane CalculatePlane(const Triangle& _triangle);
