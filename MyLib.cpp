@@ -347,13 +347,14 @@ bool IsCollision(const AABB& _a, const Sphere& _s)
 
 bool IsCollision(const AABB& _aabb, const Segment& _segment)
 {
+	assert(_segment.diff.x != 0.0f || _segment.diff.y != 0.0f || _segment.diff.z != 0.0f);
+
 	Vector3 tminVec;
 	Vector3 tmaxVec;
 
-	tminVec.y = (_aabb.min.y - _segment.origin.y) / _segment.diff.y;
 	tminVec.x = (_aabb.min.x - _segment.origin.x) / _segment.diff.x;
+	tminVec.y = (_aabb.min.y - _segment.origin.y) / _segment.diff.y;
 	tminVec.z = (_aabb.min.z - _segment.origin.z) / _segment.diff.z;
-
 
 	tmaxVec.x = (_aabb.max.x - _segment.origin.x) / _segment.diff.x;
 	tmaxVec.y = (_aabb.max.y - _segment.origin.y) / _segment.diff.y;
