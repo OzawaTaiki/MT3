@@ -60,7 +60,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("size", &obb.size.x, 0.01f);
 		ImGui::DragFloat3("rotate", &obb.rotate.x, 0.01f);
 		ImGui::End();
-		obb.Calculateorientations();
+		obb.CalculateOrientations();
 
 		/*ImGui::Begin("sphere");
 		ImGui::DragFloat3("center", &sphere.center.x, 0.01f);

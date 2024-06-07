@@ -194,19 +194,7 @@ void DrawOBB(const OBB& _obb, const Matrix4x4& _viewProjectionMatrix, const Matr
 {
 	Vector3 vertices[8];
 
-	Vector3 rotateAxis[3];
-	rotateAxis[0] = _obb.orientations[0] * _obb.size.x;
-	rotateAxis[1] = _obb.orientations[1] * _obb.size.y;
-	rotateAxis[2] = _obb.orientations[2] * _obb.size.z;
-
-	vertices[0] = _obb.center + rotateAxis[0] + rotateAxis[1] + rotateAxis[2];
-	vertices[1] = _obb.center + rotateAxis[0] + rotateAxis[1] - rotateAxis[2];
-	vertices[2] = _obb.center + rotateAxis[0] - rotateAxis[1] + rotateAxis[2];
-	vertices[3] = _obb.center + rotateAxis[0] - rotateAxis[1] - rotateAxis[2];
-	vertices[4] = _obb.center - rotateAxis[0] + rotateAxis[1] + rotateAxis[2];
-	vertices[5] = _obb.center - rotateAxis[0] + rotateAxis[1] - rotateAxis[2];
-	vertices[6] = _obb.center - rotateAxis[0] - rotateAxis[1] + rotateAxis[2];
-	vertices[7] = _obb.center - rotateAxis[0] - rotateAxis[1] - rotateAxis[2];
+	_obb.CaluculateVertices(vertices);
 
 	for (Vector3& v : vertices)
 	{
@@ -446,6 +434,33 @@ bool IsCollision(const OBB& _obb, const Segment& _segment)
 	return IsCollision(localAABB, localSegment);
 }
 
+bool IsCollision(const OBB& _obb1, const OBB& _obb2)
+{
+	/// 分離軸候補の計算
+	Vector3 axis[15];
+	axis[0] = _obb1.orientations[0];
+	axis[1] = _obb1.orientations[1];
+	axis[2] = _obb1.orientations[2];
+
+	axis[3] = _obb2.orientations[0];
+	axis[4] = _obb2.orientations[1];
+	axis[5] = _obb2.orientations[2];
+
+	int index = 6;
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			axis[index++] = VectorFunction::Cross(_obb1.orientations[i], _obb2.orientations[j]);
+		}
+	}
+
+
+
+
+	return false;
+}
+
 Plane CalculatePlane(const Triangle& _triangle)
 {
 	Plane result{};
@@ -474,7 +489,7 @@ void AABB::Update()
 	this->max.z = (std::max)(this->min.z, this->max.z);
 }
 
-void OBB::Calculateorientations()
+void OBB::CalculateOrientations()
 {
 	Matrix4x4 rotateMatrix = MatrixFunction::MakeRotateMatrix(this->rotate);
 
@@ -495,3 +510,21 @@ void OBB::Calculateorientations()
 	this->orientations[1] = VectorFunction::Normalize(this->orientations[1]);
 	this->orientations[2] = VectorFunction::Normalize(this->orientations[2]);
 }
+
+void OBB::CaluculateVertices(Vector3* vertices) const
+{
+	Vector3 rotateAxis[3];
+	rotateAxis[0] = this->orientations[0] * this->size.x;
+	rotateAxis[1] = this->orientations[1] * this->size.y;
+	rotateAxis[2] = this->orientations[2] * this->size.z;
+
+	vertices[0] = this->center + rotateAxis[0] + rotateAxis[1] + rotateAxis[2];
+	vertices[1] = this->center + rotateAxis[0] + rotateAxis[1] - rotateAxis[2];
+	vertices[2] = this->center + rotateAxis[0] - rotateAxis[1] + rotateAxis[2];
+	vertices[3] = this->center + rotateAxis[0] - rotateAxis[1] - rotateAxis[2];
+	vertices[4] = this->center - rotateAxis[0] + rotateAxis[1] + rotateAxis[2];
+	vertices[5] = this->center - rotateAxis[0] + rotateAxis[1] - rotateAxis[2];
+	vertices[6] = this->center - rotateAxis[0] - rotateAxis[1] + rotateAxis[2];
+	vertices[7] = this->center - rotateAxis[0] - rotateAxis[1] - rotateAxis[2];
+}
+
