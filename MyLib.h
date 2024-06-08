@@ -59,7 +59,12 @@ struct OBB
 	Vector3 rotate;				//回転角
 
 public:
-	void Calculateorientations();
+	void CalculateOrientations();
+	/// <summary>
+	/// 頂点の計算
+	/// </summary>
+	/// <param name="vertices">計算結果を格納するVecter3配列</param>
+	void CaluculateVertices(Vector3* vertices)const;
 };
 //グリッドの描画
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
@@ -115,8 +120,19 @@ bool IsCollision(const AABB& _aabb, const Segment& _segment);
 //obbと球の衝突判定
 bool IsCollision(const OBB& _obb, const Sphere& _sphere);
 
+//obbと線分の衝突判定
 bool IsCollision(const OBB& _obb, const Segment& _segment);
 
+//obbとobbの衝突判定
+bool IsCollision(const OBB& _obb1, const OBB& _obb2);
 
 //三角形のある平面を計算
 Plane CalculatePlane(const Triangle& _triangle);
+
+/// <summary>
+/// 射影ベクトルのminとmaxを返す
+/// </summary>
+/// <param name="_obb">OBB</param>
+/// <param name="_axis">分離軸候補</param>
+/// <returns>最小と最大</returns>
+void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min, float& _max);
