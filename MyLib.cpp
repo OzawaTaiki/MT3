@@ -437,28 +437,46 @@ bool IsCollision(const OBB& _obb, const Segment& _segment)
 bool IsCollision(const OBB& _obb1, const OBB& _obb2)
 {
 	/// 分離軸候補の計算
-	Vector3 axis[15];
-	axis[0] = _obb1.orientations[0];
-	axis[1] = _obb1.orientations[1];
-	axis[2] = _obb1.orientations[2];
+	Vector3 axes[15];
+	axes[0] = _obb1.orientations[0];
+	axes[1] = _obb1.orientations[1];
+	axes[2] = _obb1.orientations[2];
 
-	axis[3] = _obb2.orientations[0];
-	axis[4] = _obb2.orientations[1];
-	axis[5] = _obb2.orientations[2];
+	axes[3] = _obb2.orientations[0];
+	axes[4] = _obb2.orientations[1];
+	axes[5] = _obb2.orientations[2];
 
 	int index = 6;
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			axis[index++] = VectorFunction::Cross(_obb1.orientations[i], _obb2.orientations[j]);
+			axes[index++] = VectorFunction::Cross(_obb1.orientations[i], _obb2.orientations[j]);
 		}
 	}
 
+	for (auto axis : axes)
+	{
+		float minObb1, maxObb1;
+		float minObb2, maxObb2;
 
+		//軸に射影および点の最大と最小を求める
+		CalculateProjectionRange(_obb1, axis, minObb1, maxObb1);
+		CalculateProjectionRange(_obb2, axis, minObb2, maxObb2);
 
+		float l1, l2;
+		l1 = maxObb1 - minObb1;
+		l2 = maxObb2 - minObb2;
 
-	return false;
+		float sumSpan = l1 + l2;
+
+		float longSpan = std::max(maxObb1, maxObb2) - std::min(minObb1, minObb2);
+		if (sumSpan < longSpan)
+		{	//分離している	//すなわち衝突していない
+			return false;
+		}
+	}
+	return true;
 }
 
 Plane CalculatePlane(const Triangle& _triangle)
@@ -477,6 +495,24 @@ Plane CalculatePlane(const Triangle& _triangle)
 	result.distance = VectorFunction::Dot(_triangle.vertices[0], result.normal);
 
 	return result;
+}
+
+void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min, float& _max)
+{
+	Vector3 verties[8];
+	_obb.CaluculateVertices(verties);
+
+	_min = (float)INFINITE;
+	_max = -(float)INFINITE;
+
+	for (auto vertex : verties)
+	{
+		float proj = VectorFunction::Dot(_axis, vertex);
+		_min = std::min(_min, proj);
+		_max = std::max(_max, proj);
+	}
+
+	return;
 }
 
 void AABB::Update()
