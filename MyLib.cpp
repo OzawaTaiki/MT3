@@ -120,6 +120,22 @@ void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _vi
 
 }
 
+void Drawline_se(const Vector3& _start, const Vector3& _end, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
+{
+	Vector3 start = _start;
+	Vector3 end = _end;
+
+	Vector3 temp = VectorFunction::Transform(start, _viewProjectionMatrix);
+	start = VectorFunction::Transform(temp, _viewportMatrix);
+
+
+	temp = VectorFunction::Transform(end, _viewProjectionMatrix);
+	end = VectorFunction::Transform(temp, _viewportMatrix);
+
+	Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, _color);
+
+}
+
 void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
 {
 	Vector3 center = _plane.normal * _plane.distance; // 1
@@ -213,6 +229,35 @@ void DrawOBB(const OBB& _obb, const Matrix4x4& _viewProjectionMatrix, const Matr
 	Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[6].x, (int)vertices[6].y, _color);
 	Novice::DrawLine((int)vertices[5].x, (int)vertices[5].y, (int)vertices[7].x, (int)vertices[7].y, _color);
 	Novice::DrawLine((int)vertices[6].x, (int)vertices[6].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+}
+
+void DrawBezier(const Bezier& _bezier, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color, bool _isDrawPoint)
+{
+	float subDivision = 32;//ポイント間の分割数
+
+	for (int i = 0; i < subDivision; i++)
+	{
+		float t1, t2;
+		t1 = float(i) / subDivision;
+		t2 = float(i + 1) / subDivision;
+
+		Vector3 point[2];
+		point[0] = CalculatePointBezier(_bezier, t1);
+		point[1] = CalculatePointBezier(_bezier, t2);
+
+
+		Drawline_se(point[0], point[1], _viewProjectionMatrix, _viewportMatrix, _color);
+	}
+	if (_isDrawPoint)
+	{
+		Sphere point[3];
+		for (int i = 0; i < 3; i++)
+		{
+			point[i].center = _bezier.point[i];
+			point[i].radius = 0.01f;
+			DrawSphere(point[i], _viewProjectionMatrix, _viewportMatrix, BLACK);
+		}
+	}
 }
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2)
@@ -513,6 +558,16 @@ void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min
 	}
 
 	return;
+}
+
+Vector3 CalculatePointBezier(const Bezier& _bezier, float _t)
+{
+	Vector3 point[3];
+	point[0] = VectorFunction::Lerp(_bezier.point[0], _bezier.point[1], _t);
+	point[1] = VectorFunction::Lerp(_bezier.point[1], _bezier.point[2], _t);
+	point[2] = VectorFunction::Lerp(point[0], point[1], _t);
+
+	return point[2];
 }
 
 void AABB::Update()

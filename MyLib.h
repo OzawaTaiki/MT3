@@ -66,6 +66,12 @@ public:
 	/// <param name="vertices">計算結果を格納するVecter3配列</param>
 	void CaluculateVertices(Vector3* vertices)const;
 };
+
+struct Bezier
+{
+	Vector3 point[3];
+};
+
 //グリッドの描画
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
 //球体の描画
@@ -73,14 +79,17 @@ void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, c
 //直線の描画
 void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
 
+void Drawline_se(const Vector3& _start, const Vector3& _end, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
+
 void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
 
 void DrawTriangle(const Triangle& _triangle, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
 
-
 void DrawAABB(const AABB& _aabb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
 
 void DrawOBB(const OBB& _obb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color);
+
+void DrawBezier(const Bezier& _bezier, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color, bool _isDrawPoint);
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2);
 
@@ -88,6 +97,7 @@ Vector3 ClosestPoint(const Vector3& _point, const Segment& _segment);
 
 //法線に垂直なVectorを求める
 Vector3 Perpendicular(const Vector3& _v);
+
 
 /// <summary>
 /// 平面の四点を求める
@@ -98,7 +108,6 @@ void GetPlaneVertex(const Plane& _plane, Vector3* _vertex);
 
 //球体同士の衝突判定
 bool IsCollision(const Sphere& _s1, const Sphere& _s2);
-
 
 bool IsCollision(const Sphere& _s, const Plane& _p);
 
@@ -136,3 +145,6 @@ Plane CalculatePlane(const Triangle& _triangle);
 /// <param name="_axis">分離軸候補</param>
 /// <returns>最小と最大</returns>
 void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min, float& _max);
+
+
+Vector3 CalculatePointBezier(const Bezier& _bezier, float _t);
