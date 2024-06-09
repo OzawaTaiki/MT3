@@ -113,6 +113,14 @@ Vector3 VectorFunction::Transform(const Vector3& _vector, const Matrix4x4& _matr
 	return result;
 }
 
+Vector3 VectorFunction::Lerp(const Vector3& _vector1, const Vector3& _vector2, float _t)
+{
+	Vector3 result;
+	result = _vector1 * (1.0f - _t) + _vector2 * _t;
+
+	return result;
+}
+
 Vector3 operator+(const Vector3& _v1, const Vector3& _v2)
 {
 	return Vector3(_v1.x + _v2.x, _v1.y + _v2.y, _v1.z + _v2.z);
