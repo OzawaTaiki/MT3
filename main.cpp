@@ -22,12 +22,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
 
-	Vector3 cpoint[4] = {
-		{ -0.8f, 0.58f, 1.0f },
-		{ 1.76f,1.0f,-0.3f },
-		{0.94f,-0.7f, 2.3f },
-		{-0.53f, -0.26f, -0.15f}
+
+	Vector3 translates[3] = {
+		{0.2f, 1.0f, 0.0f},
+		{0.4f, 0.0f, 0.0f},
+		{0.3f, 0.0f, 0.0f}
 	};
+	Vector3 rotates[3] = {
+		{0.0f, 0.0f, -6.8f},
+		{0.0f, 0.0f, -1.4f},
+		{0.0f, 0.0f, 0.0f }
+	};
+	Vector3 scales[3] = {
+		{1.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f}
+	};
+	Sphere point[3];
+	for (int i = 0; i < 3; i++)
+	{
+		point[i].center = translates[i];
+		point[i].radius = 0.1f;
+	}
+
+	Matrix4x4 worldMat[3];
+	float radius = 0.01f;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -44,14 +63,36 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-
-		ImGui::Begin("CatmullRom");
-		ImGui::DragFloat3("point_0", &cpoint[0].x, 0.01f);
-		ImGui::DragFloat3("point_1", &cpoint[1].x, 0.01f);
-		ImGui::DragFloat3("point_2", &cpoint[2].x, 0.01f);
-		ImGui::DragFloat3("point_3", &cpoint[3].x, 0.01f);
+		ImGui::Begin("point");
+		ImGui::DragFloat("radius", &radius, 0.01f);
 		ImGui::End();
 
+		ImGui::Begin("window");
+		ImGui::DragFloat3("scale_0", &scales[0].x, 0.01f);
+		ImGui::DragFloat3("rotate_0", &rotates[0].x, 0.01f);
+		ImGui::DragFloat3("translate_0", &translates[0].x, 0.01f);
+
+		ImGui::DragFloat3("scale_1", &scales[1].x, 0.01f);
+		ImGui::DragFloat3("rotate_1", &rotates[1].x, 0.01f);
+		ImGui::DragFloat3("translate_1", &translates[1].x, 0.01f);
+
+		ImGui::DragFloat3("scale_2", &scales[2].x, 0.01f);
+		ImGui::DragFloat3("rotate_2", &rotates[2].x, 0.01f);
+		ImGui::DragFloat3("translate_2", &translates[2].x, 0.01f);
+
+		ImGui::End();
+
+		worldMat[0] = MatrixFunction::MakeAffineMatrix(scales[0], rotates[0], translates[0]);
+		worldMat[1] = MatrixFunction::MakeAffineMatrix(scales[1], rotates[1], translates[1]) * worldMat[0];
+		worldMat[2] = MatrixFunction::MakeAffineMatrix(scales[2], rotates[2], translates[2]) * worldMat[1];
+
+		Vector3 drawPos[3];
+		for (int i = 0; i < 3; i++)
+		{
+			drawPos[i] = { worldMat[i].m[3][0],worldMat[i].m[3][1],worldMat[i].m[3][2] };
+			point[i].center = drawPos[i];
+			point[i].radius = radius;
+		}
 
 		///
 		/// ↑更新処理ここまで
@@ -63,7 +104,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawCatmullRom(cpoint[0], cpoint[1], cpoint[2], cpoint[3], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), BLUE, 1);
+		Drawline_se(drawPos[0], drawPos[1], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		Drawline_se(drawPos[1], drawPos[2], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+
+		DrawSphere(point[0], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), RED);
+		DrawSphere(point[1], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), GREEN);
+		DrawSphere(point[2], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), BLUE);
 
 		///
 		/// ↑描画処理ここまで
