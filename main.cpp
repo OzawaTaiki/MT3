@@ -5,7 +5,7 @@
 #include <cmath>
 #include <imgui.h>
 
-const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_02_08";
+const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3_02_09";
 
 static const int kWindowWidth = 1280;
 static const int kWindowHeight = 720;
