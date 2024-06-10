@@ -91,6 +91,8 @@ void DrawOBB(const OBB& _obb, const Matrix4x4& _viewProjectionMatrix, const Matr
 
 void DrawBezier(const Bezier& _bezier, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color, bool _isDrawPoint);
 
+void DrawCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint1, const Vector3& _cPoint2, const Vector3& _cPoint3, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color, bool _isDrawPoint);
+
 Vector3 Project(const Vector3& _v1, const Vector3& _v2);
 
 Vector3 ClosestPoint(const Vector3& _point, const Segment& _segment);
@@ -146,5 +148,6 @@ Plane CalculatePlane(const Triangle& _triangle);
 /// <returns>最小と最大</returns>
 void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min, float& _max);
 
-
 Vector3 CalculatePointBezier(const Bezier& _bezier, float _t);
+
+Vector3 CalculatePointCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint1, const Vector3& _cPoint2, const Vector3& _cPoint3, float _t);
