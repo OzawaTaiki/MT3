@@ -22,12 +22,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
 
-	Bezier bezier = {
-		.point = {
-			{-0.8f,0.58f,1.0f},
-			{-1.76f,1.0f,-0.3f},
-			{0.94f,-0.7f,2.3f},
-		}
+	Vector3 cpoint[4] = {
+		{ -0.8f, 0.58f, 1.0f },
+		{ 1.76f,1.0f,-0.3f },
+		{0.94f,-0.7f, 2.3f },
+		{-0.53f, -0.26f, -0.15f}
 	};
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -77,10 +76,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::End();
 		plane.normal = VectorFunction::Normalize(plane.normal);*/
 
-		ImGui::Begin("Bezier");
+		/*ImGui::Begin("Bezier");
 		ImGui::DragFloat3("point_0", &bezier.point[0].x, 0.01f);
 		ImGui::DragFloat3("point_1", &bezier.point[1].x, 0.01f);
 		ImGui::DragFloat3("point_2", &bezier.point[2].x, 0.01f);
+		ImGui::End();*/
+
+		ImGui::Begin("CatmullRom");
+		ImGui::DragFloat3("point_0", &cpoint[0].x, 0.01f);
+		ImGui::DragFloat3("point_1", &cpoint[1].x, 0.01f);
+		ImGui::DragFloat3("point_2", &cpoint[2].x, 0.01f);
+		ImGui::DragFloat3("point_3", &cpoint[3].x, 0.01f);
 		ImGui::End();
 
 		//bool isCollisin = IsCollision(obb1, obb2);
@@ -95,7 +101,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawBezier(bezier, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), BLUE, 1);
+		DrawCatmullRom(cpoint[0], cpoint[1], cpoint[2], cpoint[3], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), BLUE, 1);
+		//DrawBezier(bezier, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), BLUE, 1);
 		//DrawOBB(obb1, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), isCollisin ? RED : WHITE);
 		//Drawline(segment.origin, segment.diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 		//DrawSphere(sphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);

@@ -260,6 +260,45 @@ void DrawBezier(const Bezier& _bezier, const Matrix4x4& _viewProjectionMatrix, c
 	}
 }
 
+void DrawCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint1, const Vector3& _cPoint2, const Vector3& _cPoint3, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color, bool _isDrawPoint)
+{
+	float subDivision = 32;//ポイント間の分割数
+
+	for (int i = 0; i < subDivision; i++)
+	{
+		float t1, t2;
+		t1 = float(i) / subDivision;
+		t2 = float(i + 1) / subDivision;
+
+		Vector3 point[3][2];
+		point[0][0] = CalculatePointCatmullRom(_cPoint0, _cPoint0, _cPoint1, _cPoint2, t1);
+		point[0][1] = CalculatePointCatmullRom(_cPoint0, _cPoint0, _cPoint1, _cPoint2, t2);
+
+		point[1][0] = CalculatePointCatmullRom(_cPoint0, _cPoint1, _cPoint2, _cPoint3, t1);
+		point[1][1] = CalculatePointCatmullRom(_cPoint0, _cPoint1, _cPoint2, _cPoint3, t2);
+
+		point[2][0] = CalculatePointCatmullRom(_cPoint1, _cPoint2, _cPoint3, _cPoint3, t1);
+		point[2][1] = CalculatePointCatmullRom(_cPoint1, _cPoint2, _cPoint3, _cPoint3, t2);
+
+		Drawline_se(point[0][0], point[0][1], _viewProjectionMatrix, _viewportMatrix, _color);
+		Drawline_se(point[1][0], point[1][1], _viewProjectionMatrix, _viewportMatrix, _color);
+		Drawline_se(point[2][0], point[2][1], _viewProjectionMatrix, _viewportMatrix, _color);
+	}
+	if (_isDrawPoint)
+	{
+		Sphere point[4];
+		point[0].center = _cPoint0;
+		point[1].center = _cPoint1;
+		point[2].center = _cPoint2;
+		point[3].center = _cPoint3;
+		for (int i = 0; i < 4; i++)
+		{
+			point[i].radius = 0.01f;
+			DrawSphere(point[i], _viewProjectionMatrix, _viewportMatrix, BLACK);
+		}
+	}
+}
+
 Vector3 Project(const Vector3& _v1, const Vector3& _v2)
 {
 	Vector3 normalize = VectorFunction::Normalize(_v2);
@@ -568,6 +607,28 @@ Vector3 CalculatePointBezier(const Bezier& _bezier, float _t)
 	point[2] = VectorFunction::Lerp(point[0], point[1], _t);
 
 	return point[2];
+}
+
+Vector3 CalculatePointCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint1, const Vector3& _cPoint2, const Vector3& _cPoint3, float _t)
+{
+	Vector3 result;
+
+	result.x = 1.0f / 2.0f * ((-_cPoint0.x + 3 * _cPoint1.x - 3 * _cPoint2.x + _cPoint3.x) * _t * _t * _t +
+		(2 * _cPoint0.x - 5 * _cPoint1.x + 4 * _cPoint2.x - _cPoint3.x) * _t * _t +
+		(-_cPoint0.x + _cPoint2.x) * _t +
+		2 * _cPoint1.x);
+
+	result.y = 1.0f / 2.0f * ((-_cPoint0.y + 3 * _cPoint1.y - 3 * _cPoint2.y + _cPoint3.y) * _t * _t * _t +
+		(2 * _cPoint0.y - 5 * _cPoint1.y + 4 * _cPoint2.y - _cPoint3.y) * _t * _t +
+		(-_cPoint0.y + _cPoint2.y) * _t +
+		2 * _cPoint1.y);
+
+	result.z = 1.0f / 2.0f * ((-_cPoint0.z + 3 * _cPoint1.z - 3 * _cPoint2.z + _cPoint3.z) * _t * _t * _t +
+		(2 * _cPoint0.z - 5 * _cPoint1.z + 4 * _cPoint2.z - _cPoint3.z) * _t * _t +
+		(-_cPoint0.z + _cPoint2.z) * _t +
+		2 * _cPoint1.z);
+
+	return result;
 }
 
 void AABB::Update()
