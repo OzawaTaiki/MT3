@@ -63,7 +63,7 @@ Vector3  Cross(const Vector3& _v1, const Vector3& _v2)
 	return result;
 }
 
-float  length(const Vector3& _v)
+float  Length(const Vector3& _v)
 {
 	float result;
 	result = std::sqrtf(_v.x * _v.x + _v.y * _v.y + _v.z * _v.z);
@@ -73,7 +73,7 @@ float  length(const Vector3& _v)
 Vector3  Normalize(const Vector3& _v)
 {
 	Vector3 result;
-	float _length = length(_v);
+	float _length = Length(_v);
 	if (_length == 0)
 		return { 0 };
 	result.x = _v.x / _length;
@@ -144,6 +144,21 @@ Vector3 operator/(const Vector3& _v1, const Vector3& _v2)
 Vector3 operator*(const Vector3& _v, float _s)
 {
 	return Vector3(_v.x * _s, _v.y * _s, _v.z * _s);
+}
+
+Vector3 operator/(const Vector3& _v, float _s)
+{
+	return Vector3(_v.x / _s, _v.y / _s, _v.z / _s);
+}
+
+Vector3 operator*(float _s, const Vector3& _v)
+{
+	return Vector3(_v * _s);
+}
+
+Vector3 operator/(float _s, const Vector3& _v)
+{
+	return Vector3(_v / _s);
 }
 
 Vector3 operator-(const Vector3& _v)

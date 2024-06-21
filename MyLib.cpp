@@ -20,11 +20,11 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 		Vector3 endPos = { kGridHalfWidth,0,x };
 
 		// スクリーン座標系まで変換をかける
-		Vector3 temp =  Transform(startPos, _viewProjectionMatrix);
-		startPos =  Transform(temp, _viewportMatrix);
+		Vector3 temp = Transform(startPos, _viewProjectionMatrix);
+		startPos = Transform(temp, _viewportMatrix);
 
-		temp =  Transform(endPos, _viewProjectionMatrix);
-		endPos =  Transform(temp, _viewportMatrix);
+		temp = Transform(endPos, _viewProjectionMatrix);
+		endPos = Transform(temp, _viewportMatrix);
 
 		// 変換した座標を使って表示。
 		Novice::DrawLine((int)startPos.x, (int)startPos.y, (int)endPos.x, (int)endPos.y, xIndex == (kSubdivision / 2) ? 0xff : 0xaaaaaaff);
@@ -38,12 +38,12 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 		Vector3 endPos = { z,0,kGridHalfWidth };
 
 		// スクリーン座標系まで変換をかける
-		Vector3 temp =  Transform(startPos, _viewProjectionMatrix);
-		startPos =  Transform(temp, _viewportMatrix);
+		Vector3 temp = Transform(startPos, _viewProjectionMatrix);
+		startPos = Transform(temp, _viewportMatrix);
 
 
-		temp =  Transform(endPos, _viewProjectionMatrix);
-		endPos =  Transform(temp, _viewportMatrix);
+		temp = Transform(endPos, _viewProjectionMatrix);
+		endPos = Transform(temp, _viewportMatrix);
 
 		// 変換した座標を使って表示。
 		Novice::DrawLine((int)startPos.x, (int)startPos.y, (int)endPos.x, (int)endPos.y, zIndex == (kSubdivision / 2) ? 0xff : 0xaaaaaaff);
@@ -86,14 +86,14 @@ void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, c
 			};
 
 			for (int i = 0; i < 3; i++)
-				point[i] =  Add(_sphere.center,  Multiply(_sphere.radius, point[i]));
+				point[i] = Add(_sphere.center, Multiply(_sphere.radius, point[i]));
 
 			// a,b,cをScreen座標系まで変換
 			Vector3 drawPoint[3];
 			for (int i = 0; i < 3; i++)
 			{
-				Vector3 temp =  Transform(point[i], _viewProjectionMatrix);
-				drawPoint[i] =  Transform(temp, _viewportMatrix);
+				Vector3 temp = Transform(point[i], _viewProjectionMatrix);
+				drawPoint[i] = Transform(temp, _viewportMatrix);
 			}
 
 			// ab,acで線を引く
@@ -107,14 +107,14 @@ void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, c
 void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
 {
 	Vector3 start = _origin;
-	Vector3 end =  Add(_origin, _diff);
+	Vector3 end = Add(_origin, _diff);
 
-	Vector3 temp =  Transform(start, _viewProjectionMatrix);
-	start =  Transform(temp, _viewportMatrix);
+	Vector3 temp = Transform(start, _viewProjectionMatrix);
+	start = Transform(temp, _viewportMatrix);
 
 
-	temp =  Transform(end, _viewProjectionMatrix);
-	end =  Transform(temp, _viewportMatrix);
+	temp = Transform(end, _viewProjectionMatrix);
+	end = Transform(temp, _viewportMatrix);
 
 	Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, _color);
 
@@ -125,12 +125,12 @@ void Drawline_se(const Vector3& _start, const Vector3& _end, const Matrix4x4& _v
 	Vector3 start = _start;
 	Vector3 end = _end;
 
-	Vector3 temp =  Transform(start, _viewProjectionMatrix);
-	start =  Transform(temp, _viewportMatrix);
+	Vector3 temp = Transform(start, _viewProjectionMatrix);
+	start = Transform(temp, _viewportMatrix);
 
 
-	temp =  Transform(end, _viewProjectionMatrix);
-	end =  Transform(temp, _viewportMatrix);
+	temp = Transform(end, _viewProjectionMatrix);
+	end = Transform(temp, _viewportMatrix);
 
 	Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, _color);
 
@@ -140,16 +140,16 @@ void DrawPlane(const Plane& _plane, const Matrix4x4& _viewProjectionMatrix, cons
 {
 	Vector3 center = _plane.normal * _plane.distance; // 1
 	Vector3 perpendiculars[4];
-	perpendiculars[0] =  Normalize(Perpendicular(_plane.normal)); // 2
+	perpendiculars[0] = Normalize(Perpendicular(_plane.normal)); // 2
 	perpendiculars[1] = { -perpendiculars[0].x, -perpendiculars[0].y, -perpendiculars[0].z }; // 3
-	perpendiculars[2] =  Cross(_plane.normal, perpendiculars[0]); // 4
+	perpendiculars[2] = Cross(_plane.normal, perpendiculars[0]); // 4
 	perpendiculars[3] = { -perpendiculars[2].x, -perpendiculars[2].y, -perpendiculars[2].z }; // 5
 	// 6
 	Vector3 points[4];
 	for (int32_t index = 0; index < 4; ++index) {
-		Vector3 extend =  Multiply(2.0f, perpendiculars[index]);
+		Vector3 extend = Multiply(2.0f, perpendiculars[index]);
 		Vector3 point = center + extend;
-		points[index] =  Transform( Transform(point, _viewProjectionMatrix), _viewportMatrix);
+		points[index] = Transform(Transform(point, _viewProjectionMatrix), _viewportMatrix);
 	}
 	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[2].x, (int)points[2].y, _color);
 	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[3].x, (int)points[3].y, _color);
@@ -164,7 +164,7 @@ void DrawTriangle(const Triangle& _triangle, const Matrix4x4& _viewProjectionMat
 
 	for (int i = 0; i < 3; i++)
 	{
-		vertices[i] =  Transform( Transform(_triangle.vertices[i], _viewProjectionMatrix), _viewportMatrix);
+		vertices[i] = Transform(Transform(_triangle.vertices[i], _viewProjectionMatrix), _viewportMatrix);
 	}
 	Novice::DrawTriangle(int(vertices[0].x), int(vertices[0].y),
 		int(vertices[1].x), int(vertices[1].y),
@@ -188,7 +188,7 @@ void DrawAABB(const AABB& _aabb, const Matrix4x4& _viewProjectionMatrix, const M
 
 	for (Vector3& v : vertices)
 	{
-		v =  Transform( Transform(v, _viewProjectionMatrix), _viewportMatrix);
+		v = Transform(Transform(v, _viewProjectionMatrix), _viewportMatrix);
 	}
 
 	Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[1].x, (int)vertices[1].y, _color);
@@ -214,7 +214,7 @@ void DrawOBB(const OBB& _obb, const Matrix4x4& _viewProjectionMatrix, const Matr
 
 	for (Vector3& v : vertices)
 	{
-		v =  Transform( Transform(v, _viewProjectionMatrix), _viewportMatrix);
+		v = Transform(Transform(v, _viewProjectionMatrix), _viewportMatrix);
 	}
 
 	Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[1].x, (int)vertices[1].y, _color);
@@ -299,18 +299,27 @@ void DrawCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint1, const Vect
 	}
 }
 
+void DrawBall(const Ball& _ball, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix)
+{
+	Sphere ball{
+		.center = _ball.position,
+		.radius = _ball.radius
+	};
+	DrawSphere(ball, _viewProjectionMatrix, _viewportMatrix, _ball.color);
+}
+
 Vector3 Project(const Vector3& _v1, const Vector3& _v2)
 {
-	Vector3 normalize =  Normalize(_v2);
+	Vector3 normalize = Normalize(_v2);
 
-	Vector3 result =  Multiply( Dot(_v1, normalize), normalize);
+	Vector3 result = Multiply(Dot(_v1, normalize), normalize);
 
 	return result;
 }
 
 Vector3 ClosestPoint(const Vector3& _point, const Segment& _segment)
 {
-	Vector3 cp =  Add(_segment.origin, Project( Subtract(_point, _segment.origin), _segment.diff));
+	Vector3 cp = Add(_segment.origin, Project(Subtract(_point, _segment.origin), _segment.diff));
 
 	return cp;
 }
@@ -328,9 +337,9 @@ void GetPlaneVertex(const Plane& _plane, Vector3* _vertex)
 {
 	Vector3 center = _plane.normal * _plane.distance;
 
-	_vertex[0] =  Normalize(Perpendicular(_plane.normal));
+	_vertex[0] = Normalize(Perpendicular(_plane.normal));
 	_vertex[1] = { -_vertex[0].x, -_vertex[0].y, -_vertex[0].z };
-	_vertex[2] =  Cross(_plane.normal, _vertex[0]);
+	_vertex[2] = Cross(_plane.normal, _vertex[0]);
 	_vertex[3] = { -_vertex[2].x, -_vertex[2].y, -_vertex[2].z };
 
 	for (int i = 0; i < 4; i++)
@@ -339,13 +348,13 @@ void GetPlaneVertex(const Plane& _plane, Vector3* _vertex)
 
 bool IsCollision(const Sphere& _s1, const Sphere& _s2)
 {
-	float distance =  length( Subtract(_s1.center, _s2.center));
+	float distance = Length(Subtract(_s1.center, _s2.center));
 	return distance <= _s1.radius + _s2.radius ? true : false;
 }
 
 bool IsCollision(const Sphere& _s, const Plane& _p)
 {
-	float distance =  Dot(_p.normal, _s.center) - _p.distance;
+	float distance = Dot(_p.normal, _s.center) - _p.distance;
 	distance = distance < 0 ? -distance : distance;
 
 	if (distance <= _s.radius)
@@ -355,14 +364,14 @@ bool IsCollision(const Sphere& _s, const Plane& _p)
 
 bool IsCollision(const Plane& _plane, const Segment& _segment)
 {
-	float dot =  Dot(_plane.normal, _segment.diff);
+	float dot = Dot(_plane.normal, _segment.diff);
 
 	if (dot == 0.0f)
 	{
 		return false;
 	}
 
-	float t = (_plane.distance -  Dot(_segment.origin, _plane.normal)) / dot;
+	float t = (_plane.distance - Dot(_segment.origin, _plane.normal)) / dot;
 
 	if (t < 0.0f || t>1.0f)
 		return false;
@@ -374,14 +383,14 @@ bool IsCollision(const Triangle& _triangle, const Segment& _segment)
 {
 	Plane lPlane = CalculatePlane(_triangle);
 
-	float dot =  Dot(lPlane.normal, _segment.diff);
+	float dot = Dot(lPlane.normal, _segment.diff);
 
 	if (dot == 0.0f)
 	{
 		return false;
 	}
 
-	float t = (lPlane.distance -  Dot(_segment.origin, lPlane.normal)) / dot;
+	float t = (lPlane.distance - Dot(_segment.origin, lPlane.normal)) / dot;
 
 	if (t < 0.0f || t>1.0f)
 		return false;
@@ -397,13 +406,13 @@ bool IsCollision(const Triangle& _triangle, const Segment& _segment)
 	Vector3 v20 = _triangle.vertices[0] - _triangle.vertices[2];
 	Vector3 v0p = point - _triangle.vertices[0];
 
-	Vector3 cross01 =  Cross(v01, v1p);
-	Vector3 cross12 =  Cross(v12, v2p);
-	Vector3 cross20 =  Cross(v20, v0p);
+	Vector3 cross01 = Cross(v01, v1p);
+	Vector3 cross12 = Cross(v12, v2p);
+	Vector3 cross20 = Cross(v20, v0p);
 
-	if ( Dot(cross01, lPlane.normal) >= 0.0f &&
-		 Dot(cross12, lPlane.normal) >= 0.0f &&
-		 Dot(cross20, lPlane.normal) >= 0.0f)
+	if (Dot(cross01, lPlane.normal) >= 0.0f &&
+		Dot(cross12, lPlane.normal) >= 0.0f &&
+		Dot(cross20, lPlane.normal) >= 0.0f)
 	{
 		return true;
 	}
@@ -431,7 +440,7 @@ bool IsCollision(const AABB& _a, const Sphere& _s)
 	closestPoint.y = std::clamp(_s.center.y, _a.min.y, _a.max.y);
 	closestPoint.z = std::clamp(_s.center.z, _a.min.z, _a.max.z);
 
-	float distance =  length(closestPoint - _s.center);
+	float distance = Length(closestPoint - _s.center);
 
 	if (distance <= _s.radius)
 	{
@@ -489,10 +498,10 @@ bool IsCollision(const AABB& _aabb, const Segment& _segment)
 
 bool IsCollision(const OBB& _obb, const Sphere& _sphere)
 {
-	Matrix4x4 obbWolrdMat =  MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
-	Matrix4x4 obbWorldMatInv =  Inverse(obbWolrdMat);
+	Matrix4x4 obbWolrdMat = MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
+	Matrix4x4 obbWorldMatInv = Inverse(obbWolrdMat);
 
-	Vector3  centerInOBBLocalSphere =  Transform(_sphere.center, obbWorldMatInv);
+	Vector3  centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);
 	AABB aabbOBBLocal{ .min = -_obb.size,.max = _obb.size };
 	Sphere sphereOBBLocal{ centerInOBBLocalSphere,_sphere.radius };
 
@@ -502,10 +511,10 @@ bool IsCollision(const OBB& _obb, const Sphere& _sphere)
 
 bool IsCollision(const OBB& _obb, const Segment& _segment)
 {
-	Matrix4x4 obbWolrdMat =  MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
-	Matrix4x4 obbWorldMatInv =  Inverse(obbWolrdMat);
-	Vector3 localOrigin =  Transform(_segment.origin, obbWorldMatInv);
-	Vector3 localEnd =  Transform(_segment.origin + _segment.diff, obbWorldMatInv);
+	Matrix4x4 obbWolrdMat = MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
+	Matrix4x4 obbWorldMatInv = Inverse(obbWolrdMat);
+	Vector3 localOrigin = Transform(_segment.origin, obbWorldMatInv);
+	Vector3 localEnd = Transform(_segment.origin + _segment.diff, obbWorldMatInv);
 
 	AABB localAABB{
 		{-_obb.size.x, -_obb.size.y, -_obb.size.z},
@@ -535,7 +544,7 @@ bool IsCollision(const OBB& _obb1, const OBB& _obb2)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			axes[index++] =  Cross(_obb1.orientations[i], _obb2.orientations[j]);
+			axes[index++] = Cross(_obb1.orientations[i], _obb2.orientations[j]);
 		}
 	}
 
@@ -572,11 +581,11 @@ Plane CalculatePlane(const Triangle& _triangle)
 	Vector3 edge2 = _triangle.vertices[2] - _triangle.vertices[1];
 
 	//法線計算
-	result.normal =  Cross(edge1, edge2);
-	result.normal =  Normalize(result.normal);
+	result.normal = Cross(edge1, edge2);
+	result.normal = Normalize(result.normal);
 
 	//平面方程式を用いて距離を求める
-	result.distance =  Dot(_triangle.vertices[0], result.normal);
+	result.distance = Dot(_triangle.vertices[0], result.normal);
 
 	return result;
 }
@@ -591,7 +600,7 @@ void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min
 
 	for (auto vertex : verties)
 	{
-		float proj =  Dot(_axis, vertex);
+		float proj = Dot(_axis, vertex);
 		_min = std::min(_min, proj);
 		_max = std::max(_max, proj);
 	}
@@ -602,9 +611,9 @@ void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min
 Vector3 CalculatePointBezier(const Bezier& _bezier, float _t)
 {
 	Vector3 point[3];
-	point[0] =  Lerp(_bezier.point[0], _bezier.point[1], _t);
-	point[1] =  Lerp(_bezier.point[1], _bezier.point[2], _t);
-	point[2] =  Lerp(point[0], point[1], _t);
+	point[0] = Lerp(_bezier.point[0], _bezier.point[1], _t);
+	point[1] = Lerp(_bezier.point[1], _bezier.point[2], _t);
+	point[2] = Lerp(point[0], point[1], _t);
 
 	return point[2];
 }
@@ -643,7 +652,7 @@ void AABB::Update()
 
 void OBB::CalculateOrientations()
 {
-	Matrix4x4 rotateMatrix =  MakeRotateMatrix(this->rotate);
+	Matrix4x4 rotateMatrix = MakeRotateMatrix(this->rotate);
 
 
 	this->orientations[0].x = rotateMatrix.m[0][0];
@@ -658,9 +667,9 @@ void OBB::CalculateOrientations()
 	this->orientations[2].y = rotateMatrix.m[2][1];
 	this->orientations[2].z = rotateMatrix.m[2][2];
 
-	this->orientations[0] =  Normalize(this->orientations[0]);
-	this->orientations[1] =  Normalize(this->orientations[1]);
-	this->orientations[2] =  Normalize(this->orientations[2]);
+	this->orientations[0] = Normalize(this->orientations[0]);
+	this->orientations[1] = Normalize(this->orientations[1]);
+	this->orientations[2] = Normalize(this->orientations[2]);
 }
 
 void OBB::CaluculateVertices(Vector3* vertices) const
