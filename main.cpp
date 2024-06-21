@@ -25,16 +25,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	float deltaTime = 1.0f / 60.0f;
 
 	Spring spring{};
-	spring.anchor = { 0.0f, 0.0f, 0.0f };
-	spring.naturalLength = 1.0f;
+	spring.anchor = { 0.0f, 1.0f, 0.0f };
+	spring.naturalLength = 0.7f;
 	spring.stiffness = 100.0f;
 	spring.dampingCoefficient = 2.0f;
 
 	Ball ball{};
-	ball.position = { 1.2f, 0.0f, 0.0f };
+	ball.position = { 0.8f, 0.2f, 0.0f };
 	ball.mass = 2.0f;
 	ball.radius = 0.05f;
 	ball.color = BLUE;
+
+	const Vector3 kGravity{ 0.0f,-9.8f,0.0f };
 
 	bool isStart = false;
 
@@ -56,8 +58,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::Begin("window");
 
-		if (ImGui::Button("start"))
+		if (ImGui::Button("start") || keys[DIK_SPACE])
 			isStart = true;
+		if (ImGui::Button("Reset"))
+		{
+			ball.position = { 0.8f, 0.2f, 0.0f };
+			ball.velocity = { 0.0f,0.0f,0.0f };
+			isStart = false;
+		}
 
 		ImGui::End();
 
@@ -73,7 +81,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				Vector3 displacement = length * (ball.position - restPosition);
 				Vector3 restoringForce = -spring.stiffness * displacement;
 				Vector3 dapingForce = -spring.dampingCoefficient * ball.velocity;
-				Vector3 force = restoringForce + dapingForce;
+				Vector3 gravityForce = kGravity * ball.mass;
+				Vector3 force = restoringForce + dapingForce + gravityForce;
 				ball.acceleration = force / ball.mass;
 
 				ball.velocity = ball.velocity + ball.acceleration * deltaTime;
@@ -91,9 +100,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawBall(ball, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
 		Drawline(spring.anchor, diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		DrawBall(ball, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 		//Drawline_se(spring.anchor, ball.position, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///
