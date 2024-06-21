@@ -23,30 +23,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Camera* camera = new Camera(kWindowWidth, kWindowHeight);
 
 
-	Vector3 translates[3] = {
-		{0.2f, 1.0f, 0.0f},
-		{0.4f, 0.0f, 0.0f},
-		{0.3f, 0.0f, 0.0f}
-	};
-	Vector3 rotates[3] = {
-		{0.0f, 0.0f, -6.8f},
-		{0.0f, 0.0f, -1.4f},
-		{0.0f, 0.0f, 0.0f }
-	};
-	Vector3 scales[3] = {
-		{1.0f, 1.0f, 1.0f},
-		{1.0f, 1.0f, 1.0f},
-		{1.0f, 1.0f, 1.0f}
-	};
-	Sphere point[3];
-	for (int i = 0; i < 3; i++)
-	{
-		point[i].center = translates[i];
-		point[i].radius = 0.1f;
-	}
+	Vector3 a{ 0.2f, 1.0f, 0.0f };
+	Vector3 b{ 2.4f, 3.1f, 1.2f };
+	Vector3 c = a + b;
 
-	Matrix4x4 worldMat[3];
-	float radius = 0.01f;
+	Vector3 d = a - b;
+	Vector3 e = a * 2.4f;
+	Vector3 rotate{ 0.4f, 1.43f, -0.8f };
+	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
+	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
+	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
+	Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix *
+		rotateZMatrix;
+
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -63,36 +52,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		ImGui::Begin("point");
-		ImGui::DragFloat("radius", &radius, 0.01f);
+		ImGui::Begin("Window");
+		ImGui::Text("c:%f, %f, %f", c.x, c.y, c.z);
+		ImGui::Text("d:%f, %f, %f", d.x, d.y, d.z);
+		ImGui::Text("e:%f, %f, %f", e.x, e.y, e.z);
+		ImGui::Text(
+			"matrix:\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n",
+			rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0][2],
+			rotateMatrix.m[0][3], rotateMatrix.m[1][0], rotateMatrix.m[1][1],
+			rotateMatrix.m[1][2], rotateMatrix.m[1][3], rotateMatrix.m[2][0],
+			rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2][3],
+			rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2],
+			rotateMatrix.m[3][3]);
 		ImGui::End();
 
-		ImGui::Begin("window");
-		ImGui::DragFloat3("scale_0", &scales[0].x, 0.01f);
-		ImGui::DragFloat3("rotate_0", &rotates[0].x, 0.01f);
-		ImGui::DragFloat3("translate_0", &translates[0].x, 0.01f);
 
-		ImGui::DragFloat3("scale_1", &scales[1].x, 0.01f);
-		ImGui::DragFloat3("rotate_1", &rotates[1].x, 0.01f);
-		ImGui::DragFloat3("translate_1", &translates[1].x, 0.01f);
 
-		ImGui::DragFloat3("scale_2", &scales[2].x, 0.01f);
-		ImGui::DragFloat3("rotate_2", &rotates[2].x, 0.01f);
-		ImGui::DragFloat3("translate_2", &translates[2].x, 0.01f);
-
-		ImGui::End();
-
-		worldMat[0] =  MakeAffineMatrix(scales[0], rotates[0], translates[0]);
-		worldMat[1] =  MakeAffineMatrix(scales[1], rotates[1], translates[1]) * worldMat[0];
-		worldMat[2] =  MakeAffineMatrix(scales[2], rotates[2], translates[2]) * worldMat[1];
-
-		Vector3 drawPos[3];
-		for (int i = 0; i < 3; i++)
-		{
-			drawPos[i] = { worldMat[i].m[3][0],worldMat[i].m[3][1],worldMat[i].m[3][2] };
-			point[i].center = drawPos[i];
-			point[i].radius = radius;
-		}
 
 		///
 		/// ↑更新処理ここまで
@@ -104,12 +79,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
-		Drawline_se(drawPos[0], drawPos[1], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
-		Drawline_se(drawPos[1], drawPos[2], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
-
-		DrawSphere(point[0], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), RED);
-		DrawSphere(point[1], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), GREEN);
-		DrawSphere(point[2], camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), BLUE);
 
 		///
 		/// ↑描画処理ここまで
