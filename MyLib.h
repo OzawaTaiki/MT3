@@ -72,6 +72,24 @@ struct Bezier
 	Vector3 point[3];
 };
 
+struct Spring
+{
+	Vector3 anchor;				//アンカー固定された位置
+	float naturalLength;		//自然長
+	float stiffness;			//剛性。ばね定数ｋ
+	float dampingCoefficient;	//減衰係数
+};
+
+struct Ball
+{
+	Vector3 position;		//ボールの位置
+	Vector3 velocity;		//ボールの速度
+	Vector3 acceleration;	//ボールの加速度
+	float mass;				//ボールの質量
+	float radius;			//ボールの半径
+	unsigned int color;		//ボールの色
+};
+
 //グリッドの描画
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
 //球体の描画
@@ -92,6 +110,8 @@ void DrawOBB(const OBB& _obb, const Matrix4x4& _viewProjectionMatrix, const Matr
 void DrawBezier(const Bezier& _bezier, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color, bool _isDrawPoint);
 
 void DrawCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint1, const Vector3& _cPoint2, const Vector3& _cPoint3, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color, bool _isDrawPoint);
+
+void DrawBall(const Ball& _ball, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2);
 
