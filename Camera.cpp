@@ -6,8 +6,8 @@ Camera::Camera(int _windowWidth, int _windowHeight)
 {
 	windowSize = { (float)_windowWidth,(float)_windowHeight };
 
-	projectionMatrix = MatrixFunction::MakePerspectiveFovMatrix(0.45f, windowSize.x / windowSize.y, 0.1f, 100.0f);
-	viewportMatrix = MatrixFunction::MakeViewportMatrix(0, 0, windowSize.x, windowSize.y, 0.0f, 1.0f);
+	projectionMatrix =  MakePerspectiveFovMatrix(0.45f, windowSize.x / windowSize.y, 0.1f, 100.0f);
+	viewportMatrix =  MakeViewportMatrix(0, 0, windowSize.x, windowSize.y, 0.0f, 1.0f);
 	initialize();
 }
 
@@ -21,8 +21,8 @@ void Camera::initialize(const Vector3& _scale, const Vector3& _rotate, const Vec
 	rotate = _rotate;
 	translate = _translate;
 
-	cameraMatrix = MatrixFunction::MakeAffineMatrix(_scale, _rotate, _translate);
-	viewMatrix = MatrixFunction::Inverse(cameraMatrix);
+	cameraMatrix =  MakeAffineMatrix(_scale, _rotate, _translate);
+	viewMatrix =  Inverse(cameraMatrix);
 }
 
 void Camera::Update(const char* _keys, const char* _preKeys)
@@ -43,8 +43,8 @@ void Camera::Update(const char* _keys, const char* _preKeys)
 
 	if (_keys[DIK_LCONTROL] || isCameraControl)
 	{
-		Vector3 mouseMove = VectorFunction::Subtract(mousePos, preMousePos);
-		//VectorFunction::VectorScreenPrintf(0, 0, mouseMove);
+		Vector3 mouseMove =  Subtract(mousePos, preMousePos);
+		// VectorScreenPrintf(0, 0, mouseMove);
 		rotate.x += mouseMove.y * mouseSensi;
 		rotate.y += mouseMove.x * mouseSensi;
 
@@ -62,16 +62,16 @@ void Camera::Update(const char* _keys, const char* _preKeys)
 		if (_keys[DIK_S])
 			move.z -= 1;
 
-		Matrix4x4 RotateYMatrix = MatrixFunction::MakeRotateYMatrix(rotate.y);
+		Matrix4x4 RotateYMatrix =  MakeRotateYMatrix(rotate.y);
 
-		Vector3 nMove = VectorFunction::Normalize(move);
-		Vector3 direction = VectorFunction::Transform(nMove, RotateYMatrix);
-		translate = VectorFunction::Add(VectorFunction::Multiply(cameraMoveSpeed, direction), translate);
+		Vector3 nMove =  Normalize(move);
+		Vector3 direction =  Transform(nMove, RotateYMatrix);
+		translate =  Add( Multiply(cameraMoveSpeed, direction), translate);
 	}
 
-	cameraMatrix = MatrixFunction::MakeAffineMatrix(scale, rotate, translate);
-	viewMatrix = MatrixFunction::Inverse(cameraMatrix);
-	viewProjectionMatrix = MatrixFunction::Multiply(viewMatrix, projectionMatrix);
+	cameraMatrix =  MakeAffineMatrix(scale, rotate, translate);
+	viewMatrix =  Inverse(cameraMatrix);
+	viewProjectionMatrix =  Multiply(viewMatrix, projectionMatrix);
 }
 
 void Camera::ImGui()
