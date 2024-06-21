@@ -90,6 +90,12 @@ struct Ball
 	unsigned int color;		//ボールの色
 };
 
+struct Circle
+{
+	Vector3 center;	//中心
+	float radius;	//半径
+};
+
 //グリッドの描画
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
 //球体の描画
