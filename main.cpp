@@ -82,9 +82,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::End();
 
-		worldMat[0] = MatrixFunction::MakeAffineMatrix(scales[0], rotates[0], translates[0]);
-		worldMat[1] = MatrixFunction::MakeAffineMatrix(scales[1], rotates[1], translates[1]) * worldMat[0];
-		worldMat[2] = MatrixFunction::MakeAffineMatrix(scales[2], rotates[2], translates[2]) * worldMat[1];
+		worldMat[0] =  MakeAffineMatrix(scales[0], rotates[0], translates[0]);
+		worldMat[1] =  MakeAffineMatrix(scales[1], rotates[1], translates[1]) * worldMat[0];
+		worldMat[2] =  MakeAffineMatrix(scales[2], rotates[2], translates[2]) * worldMat[1];
 
 		Vector3 drawPos[3];
 		for (int i = 0; i < 3; i++)
