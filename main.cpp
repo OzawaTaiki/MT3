@@ -27,7 +27,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	float deltaTime = 1.0f / 60.0f;
 
 	Plane plane = {
-		.normal = Normalize({-0.2f,0.9f,-0.3f}),
+		.normal = Normalize({-0.2f,1.2f,-0.3f}),
 		.distance = 0.0f
 	};
 

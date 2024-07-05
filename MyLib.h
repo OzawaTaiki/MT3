@@ -115,6 +115,12 @@ struct ConicalPendulum
 	float angularVelocity;		//角速度ω
 };
 
+struct Capsule
+{
+	Segment segment;
+	float radius;
+};
+
 //グリッドの描画
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
 //球体の描画
