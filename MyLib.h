@@ -145,6 +145,13 @@ Vector3 ClosestPoint(const Vector3& _point, const Segment& _segment);
 //法線に垂直なVectorを求める
 Vector3 Perpendicular(const Vector3& _v);
 
+/// <summary>
+///
+/// </summary>
+/// <param name="_input"></param>
+/// <param name="_normal"></param>
+/// <returns></returns>
+Vector3 Reflect(const Vector3& _input, const Vector3& _normal);
 
 /// <summary>
 /// 平面の四点を求める

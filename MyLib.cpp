@@ -167,9 +167,9 @@ void DrawTriangle(const Triangle& _triangle, const Matrix4x4& _viewProjectionMat
 		vertices[i] = Transform(Transform(_triangle.vertices[i], _viewProjectionMatrix), _viewportMatrix);
 	}
 	Novice::DrawTriangle(int(vertices[0].x), int(vertices[0].y),
-		int(vertices[1].x), int(vertices[1].y),
-		int(vertices[2].x), int(vertices[2].y),
-		_color, kFillModeWireFrame);
+						 int(vertices[1].x), int(vertices[1].y),
+						 int(vertices[2].x), int(vertices[2].y),
+						 _color, kFillModeWireFrame);
 }
 
 
@@ -331,6 +331,15 @@ Vector3 Perpendicular(const Vector3& _v)
 		return { -_v.y,_v.x,0.0f };
 	}
 	return { 0.0f, -_v.z,_v.y };
+}
+
+Vector3 Reflect(const Vector3& _input, const Vector3& _normal)
+{
+	Vector3 result;
+
+	result = _input - 2.0f * (Dot(_input, _normal) * _normal);
+
+	return Vector3(result);
 }
 
 void GetPlaneVertex(const Plane& _plane, Vector3* _vertex)
@@ -623,19 +632,19 @@ Vector3 CalculatePointCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint
 	Vector3 result;
 
 	result.x = 1.0f / 2.0f * ((-_cPoint0.x + 3 * _cPoint1.x - 3 * _cPoint2.x + _cPoint3.x) * _t * _t * _t +
-		(2 * _cPoint0.x - 5 * _cPoint1.x + 4 * _cPoint2.x - _cPoint3.x) * _t * _t +
-		(-_cPoint0.x + _cPoint2.x) * _t +
-		2 * _cPoint1.x);
+							  (2 * _cPoint0.x - 5 * _cPoint1.x + 4 * _cPoint2.x - _cPoint3.x) * _t * _t +
+							  (-_cPoint0.x + _cPoint2.x) * _t +
+							  2 * _cPoint1.x);
 
 	result.y = 1.0f / 2.0f * ((-_cPoint0.y + 3 * _cPoint1.y - 3 * _cPoint2.y + _cPoint3.y) * _t * _t * _t +
-		(2 * _cPoint0.y - 5 * _cPoint1.y + 4 * _cPoint2.y - _cPoint3.y) * _t * _t +
-		(-_cPoint0.y + _cPoint2.y) * _t +
-		2 * _cPoint1.y);
+							  (2 * _cPoint0.y - 5 * _cPoint1.y + 4 * _cPoint2.y - _cPoint3.y) * _t * _t +
+							  (-_cPoint0.y + _cPoint2.y) * _t +
+							  2 * _cPoint1.y);
 
 	result.z = 1.0f / 2.0f * ((-_cPoint0.z + 3 * _cPoint1.z - 3 * _cPoint2.z + _cPoint3.z) * _t * _t * _t +
-		(2 * _cPoint0.z - 5 * _cPoint1.z + 4 * _cPoint2.z - _cPoint3.z) * _t * _t +
-		(-_cPoint0.z + _cPoint2.z) * _t +
-		2 * _cPoint1.z);
+							  (2 * _cPoint0.z - 5 * _cPoint1.z + 4 * _cPoint2.z - _cPoint3.z) * _t * _t +
+							  (-_cPoint0.z + _cPoint2.z) * _t +
+							  2 * _cPoint1.z);
 
 	return result;
 }

@@ -12,7 +12,8 @@ static const int kWindowWidth = 1280;
 static const int kWindowHeight = 720;
 
 // Windowsアプリでのエントリーポイント(main関数)
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
 
 	// ライブラリの初期化
 	Novice::Initialize(kWindowTitle, kWindowWidth, kWindowHeight);
@@ -25,19 +26,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	float deltaTime = 1.0f / 60.0f;
 
-	ConicalPendulum conicalPendulum = {
-		.anchor = {0.0f,1.0f,0.0f},
-		.length = 0.8f,
-		.halfApexAngle = 0.7f,
-		.angle = 0.0f,
-		.angularVelocity = 0.0f,
+	Plane plane = {
+		.normal = Normalize({-0.2f,0.9f,-0.3f}),
+		.distance = 0.0f
 	};
 
-	Sphere bob = {
-		.center = {0,0,0},
-		.radius = 0.1f
+	Ball ball = {
+		.position = {0.8f,1.2f,0.3f},
+		.acceleration = {0.0f,-9.8f,0.0f},
+		.mass = 2.0f,
+		.radius = 0.05f,
+		.color = WHITE
 	};
 
+	float e = 0.8f;
 
 	bool isStart = false;
 
@@ -63,10 +65,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		if (ImGui::Button("start") || keys[DIK_SPACE])
 			isStart = true;
-		/*if (ImGui::Button("Reset"))
+		if (ImGui::Button("Reset"))
 		{
 			isStart = false;
-		}*/
+			ball.position = { 0.8f,1.2f,0.3f };
+			ball.velocity = { 0.0f,0.0f,0.0f };
+		}
+		ImGui::DragFloat("e", &e, 0.01f);
 
 		//ImGui::Text("speed \n%.3f,%.3f,%.3f", speed.x, speed.y, speed.z);
 		//ImGui::Text(" %.3f,%.3f,%.3f", sphere.center.x, sphere.center.y, speed.z);
@@ -81,14 +86,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		if (isStart)
 		{
-			conicalPendulum.angularVelocity = std::sqrt(9.8f / (conicalPendulum.length * std::cos(conicalPendulum.halfApexAngle)));
-			conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
+			ball.velocity += ball.acceleration * deltaTime;
+			ball.position += ball.velocity * deltaTime;
 
-			float radius = std::sin(conicalPendulum.halfApexAngle) * conicalPendulum.length;
-			float height = std::cos(conicalPendulum.halfApexAngle) * conicalPendulum.length;
-			bob.center.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * radius;
-			bob.center.y = conicalPendulum.anchor.y - height;
-			bob.center.z = conicalPendulum.anchor.z - std::sin(conicalPendulum.angle) * radius;
+			if (IsCollision(Sphere{ ball.position, ball.radius }, plane)) {
+				Vector3 reflected = Reflect(ball.velocity, plane.normal);
+				Vector3 projectToNormal = Project(reflected, plane.normal);
+				Vector3 movingDirection = reflected - projectToNormal;
+				ball.velocity = projectToNormal * e + movingDirection;
+			}
 		}
 
 
@@ -103,8 +109,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
-		Drawline_se(conicalPendulum.anchor, bob.center, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), 0xffffffff);
-		DrawSphere(bob, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		DrawPlane(plane, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		DrawBall(ball, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
 		///
 		/// ↑描画処理ここまで
