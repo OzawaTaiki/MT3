@@ -25,20 +25,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	float deltaTime = 1.0f / 60.0f;
 
-	Sphere sphere{};
-	sphere.radius = 0.1f;
+	Pendulum pendulum = {
+		.anchor = {0.0f,1.0f,0.0f},
+		.length = 0.8f,
+		.angle = 0.7f,
+		.angularVelocity = 0.7f,
+		.angularAcceleration = 0.0f
+	};
 
+	Sphere sphere = {
+		.center = {0,0,0},
+		.radius = 0.1f
+	};
 
 	bool isStart = false;
-
-	Circle orbit;	//円運動の軌道
-	orbit.center = { 0.0f,0.5f,0.0f };
-	orbit.radius = 1.0f;
-
-	float anglarVelocity = (float)std::numbers::pi;		//時間当たりの速度
-	float angle = 0.0f;									//現在の円上での位置
-
-	Vector3 speed{ 0,0,0 };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -62,33 +62,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		if (ImGui::Button("start") || keys[DIK_SPACE])
 			isStart = true;
-		if (ImGui::Button("Reset"))
+		/*if (ImGui::Button("Reset"))
 		{
 			isStart = false;
-		}
+		}*/
 
-		ImGui::Text("speed \n%.3f,%.3f,%.3f", speed.x, speed.y, speed.z);
-		ImGui::Text(" %.3f,%.3f,%.3f", sphere.center.x, sphere.center.y, speed.z);
+		//ImGui::Text("speed \n%.3f,%.3f,%.3f", speed.x, speed.y, speed.z);
+		//ImGui::Text(" %.3f,%.3f,%.3f", sphere.center.x, sphere.center.y, speed.z);
 
-		if (ImGui::TreeNode("Orbit"))
-		{
-			ImGui::DragFloat3("Center", &orbit.center.x, 0.01f);
-			ImGui::DragFloat3("Radius", &orbit.radius, 0.01f);
-			ImGui::TreePop();
-		}
+		//if (ImGui::TreeNode("Orbit"))
+		//{
+		//	ImGui::DragFloat3("Center", &orbit.center.x, 0.01f);
+		//	ImGui::DragFloat3("Radius", &orbit.radius, 0.01f);
+		//	ImGui::TreePop();
+		//}
 		ImGui::End();
 
 		if (isStart)
 		{
-			angle += anglarVelocity * deltaTime;
+			pendulum.angularAcceleration =
+				-(9.8f / pendulum.length) * std::sin(pendulum.angle);
+			pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
+			pendulum.angle += pendulum.angularVelocity * deltaTime;
 
-			speed.x = -orbit.radius * angle * std::sin(angle);
-			speed.y = orbit.radius * angle * std::cos(angle);
-			speed.z = 0;
-
-			sphere.center.x = orbit.center.x + std::cos(angle) * orbit.radius;
-			sphere.center.y = orbit.center.y + std::sin(angle) * orbit.radius;
-			sphere.center.z = orbit.center.z;
+			//pは振り子の先端の位置。取り付けたいものを取り付ければ良い
+			sphere.center.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
+			sphere.center.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
+			sphere.center.z = pendulum.anchor.z;
 		}
 
 
@@ -103,6 +103,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
+		Drawline_se(pendulum.anchor, sphere.center, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), 0xffffffff);
 		DrawSphere(sphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///

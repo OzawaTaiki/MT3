@@ -96,6 +96,15 @@ struct Circle
 	float radius;	//半径
 };
 
+struct Pendulum
+{
+	Vector3 anchor;				//アンカーポイント
+	float length;				//紐の長さ
+	float angle;				//現在の角度
+	float angularVelocity;		//角速度ω
+	float angularAcceleration;	//角加速度
+};
+
 //グリッドの描画
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
 //球体の描画
