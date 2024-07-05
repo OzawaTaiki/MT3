@@ -25,18 +25,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	float deltaTime = 1.0f / 60.0f;
 
-	Pendulum pendulum = {
+	ConicalPendulum conicalPendulum = {
 		.anchor = {0.0f,1.0f,0.0f},
 		.length = 0.8f,
-		.angle = 0.7f,
-		.angularVelocity = 0.7f,
-		.angularAcceleration = 0.0f
+		.halfApexAngle = 0.7f,
+		.angle = 0.0f,
+		.angularVelocity = 0.0f,
 	};
 
-	Sphere sphere = {
+	Sphere bob = {
 		.center = {0,0,0},
 		.radius = 0.1f
 	};
+
 
 	bool isStart = false;
 
@@ -80,15 +81,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		if (isStart)
 		{
-			pendulum.angularAcceleration =
-				-(9.8f / pendulum.length) * std::sin(pendulum.angle);
-			pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
-			pendulum.angle += pendulum.angularVelocity * deltaTime;
+			conicalPendulum.angularVelocity = std::sqrt(9.8f / (conicalPendulum.length * std::cos(conicalPendulum.halfApexAngle)));
+			conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
 
-			//pは振り子の先端の位置。取り付けたいものを取り付ければ良い
-			sphere.center.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
-			sphere.center.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
-			sphere.center.z = pendulum.anchor.z;
+			float radius = std::sin(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+			float height = std::cos(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+			bob.center.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * radius;
+			bob.center.y = conicalPendulum.anchor.y - height;
+			bob.center.z = conicalPendulum.anchor.z - std::sin(conicalPendulum.angle) * radius;
 		}
 
 
@@ -103,8 +103,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
-		Drawline_se(pendulum.anchor, sphere.center, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), 0xffffffff);
-		DrawSphere(sphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		Drawline_se(conicalPendulum.anchor, bob.center, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), 0xffffffff);
+		DrawSphere(bob, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///
 		/// ↑描画処理ここまで
