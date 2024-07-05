@@ -3,6 +3,7 @@
 #include "Camera.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <numbers>
 #include <imgui.h>
 
 const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3";
@@ -24,21 +25,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	float deltaTime = 1.0f / 60.0f;
 
-	Spring spring{};
-	spring.anchor = { 0.0f, 1.0f, 0.0f };
-	spring.naturalLength = 0.7f;
-	spring.stiffness = 100.0f;
-	spring.dampingCoefficient = 2.0f;
+	Sphere sphere{};
+	sphere.radius = 0.1f;
 
-	Ball ball{};
-	ball.position = { 0.8f, 0.2f, 0.0f };
-	ball.mass = 2.0f;
-	ball.radius = 0.05f;
-	ball.color = BLUE;
-
-	const Vector3 kGravity{ 0.0f,-9.8f,0.0f };
 
 	bool isStart = false;
+
+	Circle orbit;	//円運動の軌道
+	orbit.center = { 0.0f,0.5f,0.0f };
+	orbit.radius = 1.0f;
+
+	float anglarVelocity = (float)std::numbers::pi;		//時間当たりの速度
+	float angle = 0.0f;									//現在の円上での位置
+
+	Vector3 speed{ 0,0,0 };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -56,39 +56,42 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 
+
+
 		ImGui::Begin("window");
 
 		if (ImGui::Button("start") || keys[DIK_SPACE])
 			isStart = true;
 		if (ImGui::Button("Reset"))
 		{
-			ball.position = { 0.8f, 0.2f, 0.0f };
-			ball.velocity = { 0.0f,0.0f,0.0f };
 			isStart = false;
 		}
 
+		ImGui::Text("speed \n%.3f,%.3f,%.3f", speed.x, speed.y, speed.z);
+		ImGui::Text(" %.3f,%.3f,%.3f", sphere.center.x, sphere.center.y, speed.z);
+
+		if (ImGui::TreeNode("Orbit"))
+		{
+			ImGui::DragFloat3("Center", &orbit.center.x, 0.01f);
+			ImGui::DragFloat3("Radius", &orbit.radius, 0.01f);
+			ImGui::TreePop();
+		}
 		ImGui::End();
-
-
-		Vector3 diff = ball.position - spring.anchor;
 
 		if (isStart)
 		{
-			float length = Length(diff);
-			if (length != 0.0f) {
-				Vector3 direction = Normalize(diff);
-				Vector3 restPosition = spring.anchor + direction * spring.naturalLength;
-				Vector3 displacement = length * (ball.position - restPosition);
-				Vector3 restoringForce = -spring.stiffness * displacement;
-				Vector3 dapingForce = -spring.dampingCoefficient * ball.velocity;
-				Vector3 gravityForce = kGravity * ball.mass;
-				Vector3 force = restoringForce + dapingForce + gravityForce;
-				ball.acceleration = force / ball.mass;
+			angle += anglarVelocity * deltaTime;
 
-				ball.velocity = ball.velocity + ball.acceleration * deltaTime;
-				ball.position = ball.position + ball.velocity * deltaTime;
-			}
+			speed.x = -orbit.radius * angle * std::sin(angle);
+			speed.y = orbit.radius * angle * std::cos(angle);
+			speed.z = 0;
+
+			sphere.center.x = orbit.center.x + std::cos(angle) * orbit.radius;
+			sphere.center.y = orbit.center.y + std::sin(angle) * orbit.radius;
+			sphere.center.z = orbit.center.z;
 		}
+
+
 
 		///
 		/// ↑更新処理ここまで
@@ -100,10 +103,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
-
-		Drawline(spring.anchor, diff, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
-		DrawBall(ball, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
-		//Drawline_se(spring.anchor, ball.position, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
+		DrawSphere(sphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///
 		/// ↑描画処理ここまで
