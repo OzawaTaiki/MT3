@@ -3,6 +3,7 @@
 #include "Camera.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <numbers>
 #include <imgui.h>
 
 const char kWindowTitle[] = "LE2A_07_オザワ_タイキ_MT3";
@@ -34,10 +35,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	orbit.center = { 0.0f,0.5f,0.0f };
 	orbit.radius = 1.0f;
 
-	float anglarVelocity = 3.14f;	//時間当たりの速度
-	float angle = 0.0f;				//現在の円上での位置
+	float anglarVelocity = (float)std::numbers::pi;		//時間当たりの速度
+	float angle = 0.0f;									//現在の円上での位置
 
-	Vector3 speed;
+	Vector3 speed{ 0,0,0 };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -54,11 +55,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		angle += anglarVelocity * deltaTime;
 
-		speed.x = -orbit.radius * angle * std::sin(angle);
-		speed.y = orbit.radius * angle * std::cos(angle);
-		speed.z = 0;
 
 
 		ImGui::Begin("window");
@@ -73,13 +70,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Text("speed \n%.3f,%.3f,%.3f", speed.x, speed.y, speed.z);
 		ImGui::Text(" %.3f,%.3f,%.3f", sphere.center.x, sphere.center.y, speed.z);
 
+		if (ImGui::TreeNode("Orbit"))
+		{
+			ImGui::DragFloat3("Center", &orbit.center.x, 0.01f);
+			ImGui::DragFloat3("Radius", &orbit.radius, 0.01f);
+			ImGui::TreePop();
+		}
 		ImGui::End();
 
-		sphere.center.x = orbit.center.x + std::cos(angle) * orbit.radius;
-		sphere.center.y = orbit.center.y + std::sin(angle) * orbit.radius;
-		//sphere.center.y = orbit.center.y;
-		sphere.center.z = orbit.center.z;
-		//sphere.center.z = orbit.center.z + std::sin(angle) * orbit.radius;
+		if (isStart)
+		{
+			angle += anglarVelocity * deltaTime;
+
+			speed.x = -orbit.radius * angle * std::sin(angle);
+			speed.y = orbit.radius * angle * std::cos(angle);
+			speed.z = 0;
+
+			sphere.center.x = orbit.center.x + std::cos(angle) * orbit.radius;
+			sphere.center.y = orbit.center.y + std::sin(angle) * orbit.radius;
+			sphere.center.z = orbit.center.z;
+		}
 
 
 
@@ -94,7 +104,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawGrid(camera->GetviewProjectionMatrix(), camera->GetViewportMatrix());
 
 		DrawSphere(sphere, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
-		//Drawline_se(spring.anchor, ball.position, camera->GetviewProjectionMatrix(), camera->GetViewportMatrix(), WHITE);
 
 		///
 		/// ↑描画処理ここまで
