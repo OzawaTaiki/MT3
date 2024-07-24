@@ -324,6 +324,28 @@ Vector3 ClosestPoint(const Vector3& _point, const Segment& _segment)
 	return cp;
 }
 
+Vector3 ClosestPoint(const Segment& _segment, const Plane& _plane)
+{
+	float dot = Dot(_plane.normal, _segment.diff);
+
+	if (dot == 0.0f)
+	{
+		//平行だったときは直線の始点を返す
+		return _segment.origin;
+	}
+
+	float t = (_plane.distance - Dot(_segment.origin, _plane.normal)) / dot;
+
+	if (t < 0.0f)
+		return _segment.origin;
+	else if (t > 1.0f)
+		return _segment.origin + _segment.diff;
+
+	Vector3 closestPoint = _segment.origin + t * _segment.diff;
+
+	return closestPoint;
+}
+
 Vector3 Perpendicular(const Vector3& _v)
 {
 	if (_v.x != 0.0f || _v.y != 0.0f)
@@ -579,6 +601,26 @@ bool IsCollision(const OBB& _obb1, const OBB& _obb2)
 		}
 	}
 	return true;
+}
+
+bool IsCollision(const Plane& _plane, const Capsule& _capsule)
+{
+	if (IsCollision(_plane, _capsule.segment))
+		return true;
+
+	Vector3 closestPoint = ClosestPoint(_capsule.segment, _plane);
+
+	//最近点を中心にした球
+	Sphere sphere{
+		.center = closestPoint,
+		.radius = _capsule.radius
+	};
+
+	//作った球と平面で判定
+	if (IsCollision(sphere, _plane))
+		return true;
+
+	return false;
 }
 
 Plane CalculatePlane(const Triangle& _triangle)

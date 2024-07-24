@@ -148,6 +148,8 @@ Vector3 Project(const Vector3& _v1, const Vector3& _v2);
 
 Vector3 ClosestPoint(const Vector3& _point, const Segment& _segment);
 
+Vector3 ClosestPoint(const Segment& _segment, const Plane& _plane);
+
 //法線に垂直なVectorを求める
 Vector3 Perpendicular(const Vector3& _v);
 
@@ -194,6 +196,9 @@ bool IsCollision(const OBB& _obb, const Segment& _segment);
 
 //obbとobbの衝突判定
 bool IsCollision(const OBB& _obb1, const OBB& _obb2);
+
+//平面とカプセルの衝突判定
+bool IsCollision(const Plane& _plane, const Capsule& _capsule);
 
 //三角形のある平面を計算
 Plane CalculatePlane(const Triangle& _triangle);
