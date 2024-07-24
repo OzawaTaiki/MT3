@@ -27,17 +27,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	float deltaTime = 1.0f / 60.0f;
 
 	Plane plane = {
-		.normal = Normalize({-0.2f,0.9f,-0.3f}),
+		.normal = Normalize({-0.2f,1.2f,-0.3f}),
 		.distance = 0.0f
 	};
 
 	Ball ball = {
-		.position = {0.8f,1.2f,0.3f},
+		.position = {0.8f,60.0f,0.3f},
 		.acceleration = {0.0f,-9.8f,0.0f},
 		.mass = 2.0f,
 		.radius = 0.05f,
-		.color = WHITE
+		.color = WHITE,
 	};
+
+	Vector3 startPosition = { 0.8f,60.0f,0.3f };
+
+	bool enableCapsuleCollision = true;
 
 	float e = 0.8f;
 
@@ -68,20 +72,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		if (ImGui::Button("Reset"))
 		{
 			isStart = false;
-			ball.position = { 0.8f,1.2f,0.3f };
+			ball.position = startPosition;
 			ball.velocity = { 0.0f,0.0f,0.0f };
 		}
+		ImGui::Checkbox("EnableCapsuleCollision", &enableCapsuleCollision);
+		ImGui::DragFloat3("startPosition", &startPosition.x, 0.01f);
+		ImGui::LabelText("Position", "x:%.3f\ty:%.3f\tz:%.3f ", ball.position.x, ball.position.y, ball.position.z);
 		ImGui::DragFloat("e", &e, 0.01f);
 
-		//ImGui::Text("speed \n%.3f,%.3f,%.3f", speed.x, speed.y, speed.z);
-		//ImGui::Text(" %.3f,%.3f,%.3f", sphere.center.x, sphere.center.y, speed.z);
-
-		//if (ImGui::TreeNode("Orbit"))
-		//{
-		//	ImGui::DragFloat3("Center", &orbit.center.x, 0.01f);
-		//	ImGui::DragFloat3("Radius", &orbit.radius, 0.01f);
-		//	ImGui::TreePop();
-		//}
 		ImGui::End();
 
 		if (isStart)
@@ -89,7 +87,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ball.velocity += ball.acceleration * deltaTime;
 			ball.position += ball.velocity * deltaTime;
 
-			if (IsCollision(Sphere{ ball.position, ball.radius }, plane)) {
+			Vector3 nextVelocity = ball.velocity + ball.acceleration * deltaTime;
+			Vector3 nextPosition = ball.position + nextVelocity * deltaTime;
+
+			Capsule collisionCapsule = {
+				.segment{
+					.origin = {ball.position},
+					.diff = {nextPosition - ball.position }
+					},
+				.radius = {ball.radius}
+			};
+
+			if (IsCollision(Sphere{ ball.position, ball.radius }, plane) ||
+				enableCapsuleCollision && IsCollision(plane, collisionCapsule))
+			{
 				Vector3 reflected = Reflect(ball.velocity, plane.normal);
 				Vector3 projectToNormal = Project(reflected, plane.normal);
 				Vector3 movingDirection = reflected - projectToNormal;
